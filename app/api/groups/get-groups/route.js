@@ -19,6 +19,8 @@ export async function GET() {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
+      console.log(err);
+      
       return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
     }
 

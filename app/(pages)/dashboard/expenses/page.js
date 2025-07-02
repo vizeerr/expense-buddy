@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchExpenses } from '@/store/slices/expensesSlice'
+import { fetchExpenses } from '@/store/slices/dashboard/expensesSlice'
 import ExpenseItem from '@/components/dashboard/ExpenseItem'
 import ExpensesFilter from '@/components/dashboard/ExpensesFilter'
 

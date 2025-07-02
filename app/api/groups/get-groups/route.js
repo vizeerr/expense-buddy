@@ -8,7 +8,7 @@ import User from '@/lib/models/User'
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const token = cookieStore.get('authToken')?.value
 
     if (!token) {
@@ -19,28 +19,35 @@ export async function GET() {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
-        console.log(err);
-        
       return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
     }
 
     await dbConnect()
+    const userEmail = decoded.email
 
-    const user = await User.findOne({ email: decoded.email })
-
+    // Get user _id to match against createdBy
+    const user = await User.findOne({ email: userEmail }).select('_id')
     if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 })
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 401 })
     }
 
-    // Fetch groups where user is a member
-    const groups = await Group.find({ 'members.user': user._id })
-      .populate('members.user', 'name email') // Optional: populate member details
+    const userId = user._id.toString()
+
+    // Fetch all groups with member info
+    const allGroups = await Group.find({})
+      .populate('members.user', 'email')
       .sort({ createdAt: -1 })
+
+    const userGroups = allGroups.filter(group =>
+      group.createdBy.toString() === userId ||               // ✅ Created by user
+      group.members?.some(m => m.user?.email === userEmail)  // ✅ Member of group
+    )
 
     return NextResponse.json({
       success: true,
-      groups
+      groups: userGroups,
     })
+
   } catch (err) {
     console.error('Fetch Groups Error:', err)
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })

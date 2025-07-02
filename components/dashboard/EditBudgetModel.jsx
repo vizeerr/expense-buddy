@@ -11,7 +11,7 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { closeAddBudget } from '@/store/slices/uiSlice'
-import { fetchBudgetSummary } from '@/store/slices/budgetSummarySlice'
+import { fetchBudgetSummary } from '@/store/slices/dashboard/budgetSummarySlice'
 
 const EditBudgetModel = () => {
   const dispatch = useDispatch()
@@ -63,7 +63,7 @@ const EditBudgetModel = () => {
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
+        className="w-[95vw] max-w-xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit}>
           <SheetHeader className='px-0 py-2'>

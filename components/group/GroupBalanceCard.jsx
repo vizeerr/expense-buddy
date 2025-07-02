@@ -3,8 +3,8 @@
 import React, { useEffect } from "react"
 import {
   Wallet, HandCoins, TrendingUp, ArrowUpRight, ArrowDown, PiggyBank, Activity,
-  Coins, BarChart as BarChartIcon, LineChart as LineChartIcon, FileBarChart, Percent,
-  Hourglass, Tag, Target, AreaChart as AreaChartIcon, BadgeDollarSign, Plus
+  Coins, BarChart as BarChartIcon, LineChart as LineChartIcon, FileBarChart,
+  Percent, Hourglass, Tag, Target, AreaChart as AreaChartIcon, BadgeDollarSign, Plus
 } from "lucide-react"
 
 import {
@@ -17,13 +17,12 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDispatch, useSelector } from 'react-redux'
 import { openAddExpense, openAddBudget } from "@/store/slices/uiSlice"
-import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
-import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
-import { fetchBudgetSummary } from '@/store/slices/dashboard/budgetSummarySlice'
-import { fetchAnalytics } from '@/store/slices/dashboard/analyticsSlice'
+import { fetchGroupBalanceSummary } from "@/store/slices/group/groupBalanceSlice"
+import { fetchGroupExpenseSummary } from "@/store/slices/group/groupExpenseSummarySlice"
+import { fetchGroupBudgetSummary } from "@/store/slices/group/groupBudgetSummarySlice"
+import { fetchGroupAnalytics } from "@/store/slices/group/analyticsSlice"
 import StatItem from "./StateItem"
 
-// Utility to format currency
 const currencyFormat = (val) => `₹ ${val?.toLocaleString?.() || '0'}`
 
 const COLORS = [
@@ -45,64 +44,58 @@ const ChartCard = ({ title, subtitle, children }) => (
   </Card>
 )
 
-const BalanceCard = () => {
+const GroupBalanceCard = ({id}) => {
   const dispatch = useDispatch()
-  const { summary, loading: balanceLoading } = useSelector(state => state.balance)
-  const { data: expenseData, loading: expenseLoading } = useSelector(state => state.expensesSummary)
-  const { data: budgetData, loading: budgetLoading } = useSelector(state => state.budget)
-  const { data: analytics, loading: analyticsLoading } = useSelector(state => state.analytics)
+  const { summary, loading: balanceLoading } = useSelector(state => state.groupBalance)
+  const { data: expenseData, loading: expenseLoading } = useSelector(state => state.groupExpensesSummary)
+  const { data: budgetData, loading: budgetLoading } = useSelector(state => state.groupBudget)
+  const { data: analytics, loading: analyticsLoading } = useSelector(state => state.groupAnalytics)
 
   useEffect(() => {
-    dispatch(fetchBalanceSummary())
-    dispatch(fetchExpensesSummary())
-    dispatch(fetchBudgetSummary())
-    dispatch(fetchAnalytics())
+    dispatch(fetchGroupBalanceSummary(id))
+    // dispatch(fetchGroupExpenseSummary())
+    // dispatch(fetchGroupBudgetSummary())
+    // dispatch(fetchGroupAnalytics())
   }, [dispatch])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-6 gap-8">
       
-      {/* --- Accounts Card --- */}
+      {/* --- Group Accounts --- */}
       <Card>
         <CardHeader className="flex items-center gap-2">
           <Wallet />
-          <p className="text-xl font-bold">Accounts</p>
+          <p className="text-xl font-bold">Group Balance</p>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex justify-between">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Total Balance</p>
-              {balanceLoading ? (
-                <Skeleton className="w-28 h-6 rounded" />
-              ) : (
-                <p className="text-2xl font-semibold text-green-400">
+              {balanceLoading ? <Skeleton className="w-28 h-6 rounded" />
+              : <p className="text-2xl font-semibold text-green-400">
                   {currencyFormat(summary?.totalBalance)}
-                </p>
-              )}
+                </p>}
             </div>
             <p className="text-xs text-muted-foreground font-semibold">This Month</p>
           </div>
           <div className="grid gap-3">
-            {balanceLoading
-              ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
-              : <>
-                  <StatItem icon={HandCoins} title="Total Credit" subtitle="Income" value={currencyFormat(summary?.totalCredit)} />
-                  <StatItem icon={ArrowDown} title="Total Debit" subtitle="Spendings" value={currencyFormat(summary?.totalDebit)} color="text-red-500" bg="bg-red-950" />
-                  <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(summary?.dailyAverage)} />
-                  <StatItem icon={Percent} title="Savings Rate" subtitle="This Month" value={`${summary?.savingsRate || '0'}%`} />
-                  <StatItem icon={TrendingUp} title="Last Month" subtitle="Balance" value={currencyFormat(summary?.lastMonthBalance)} />
-                </>
-            }
+            {balanceLoading ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />) : <>
+              <StatItem icon={HandCoins} title="Total Credit" subtitle="Group Income" value={currencyFormat(summary?.totalCredit)} />
+              <StatItem icon={ArrowDown} title="Total Debit" subtitle="Spendings" value={currencyFormat(summary?.totalDebit)} color="text-red-500" bg="bg-red-950" />
+              <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(summary?.dailyAverage)} />
+              <StatItem icon={Percent} title="Savings Rate" subtitle="This Month" value={`${summary?.savingsRate || '0'}%`} />
+              <StatItem icon={TrendingUp} title="Last Month" subtitle="Balance" value={currencyFormat(summary?.lastMonthBalance)} />
+            </>}
           </div>
         </CardContent>
       </Card>
 
-      {/* --- Expenses Card --- */}
+      {/* --- Group Expenses --- */}
       <Card>
         <CardHeader className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Wallet />
-            <p className="text-xl font-bold">Expenses</p>
+            <p className="text-xl font-bold">Group Expenses</p>
           </div>
           <Button size="sm" onClick={() => dispatch(openAddExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
@@ -134,12 +127,12 @@ const BalanceCard = () => {
         </CardContent>
       </Card>
 
-      {/* --- Budget Card --- */}
+      {/* --- Group Budget --- */}
       <Card>
         <CardHeader className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <BadgeDollarSign />
-            <p className="text-xl font-bold">Budget</p>
+            <p className="text-xl font-bold">Group Budget</p>
           </div>
           <Button size="sm" onClick={() => dispatch(openAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
@@ -170,14 +163,14 @@ const BalanceCard = () => {
         </CardContent>
       </Card>
 
-      {/* --- Analytics Charts --- */}
+      {/* --- Group Analytics Charts --- */}
       <Card className="col-span-1 lg:col-span-1 2xl:col-span-3">
         <CardHeader className="flex gap-2 items-center">
           <AreaChartIcon />
-          <p className="text-xl font-bold">Analytics</p>
+          <p className="text-xl font-bold">Group Analytics</p>
         </CardHeader>
         <CardContent className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 2xl:gap-6 gap-4">
-          <ChartCard title="Account Balance Trend" subtitle="Past 4 Weeks">
+          <ChartCard title="Balance Trend" subtitle="Last 4 Weeks">
             <ReLineChart data={analytics?.balanceTrend || []}>
               <XAxis dataKey="name" hide />
               <YAxis hide />
@@ -225,4 +218,4 @@ const BalanceCard = () => {
   )
 }
 
-export default BalanceCard
+export default GroupBalanceCard

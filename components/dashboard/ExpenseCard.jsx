@@ -1,6 +1,6 @@
 'use client'
 
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import {
   Card,
   
@@ -9,8 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useEffect } from "react";
+import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
+import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
+
 const ExpenseCard = () => {
+
   const { summary, loading: balanceLoading } = useSelector(state => state.balance)
+  const dispatch = useDispatch()
+    useEffect(() => {
+      dispatch(fetchBalanceSummary())
+      dispatch(fetchExpensesSummary())
+    }, [dispatch])
+  
 
   return (
     <div className="grid md:grid-cols-2 grid-cols-1 gap-5">

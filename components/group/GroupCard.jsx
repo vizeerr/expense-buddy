@@ -91,7 +91,7 @@ const GroupCard = ({ group, currentUserId, onView }) => {
           size="sm"
           variant="secondary"
           className="text-white"
-          onClick={() => router.push(`/groups/${group._id}`)}
+          onClick={() => router.push(`/dashboard/groups/${group._id}`)}
         >
           <Eye className="w-4 h-4 mr-2" />
           View Group

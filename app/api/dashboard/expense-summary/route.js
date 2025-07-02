@@ -26,7 +26,12 @@ export async function GET() {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     await dbConnect()
 
-    const expenses = await Expense.find({ userEmail: decoded.email, type: 'debit' })
+    // ✅ Fetch only non-trashed debit expenses
+    const expenses = await Expense.find({
+      userEmail: decoded.email,
+      type: 'debit',
+      trashed: { $ne: true } // 👈 ignore trashed:true
+    })
 
     const now = new Date()
     const thisMonth = getMonth(now)

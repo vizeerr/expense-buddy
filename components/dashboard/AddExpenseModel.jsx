@@ -33,11 +33,11 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { closeAddExpense } from '@/store/slices/uiSlice'
-import { addExpense } from '@/store/slices/expensesSlice'
-import { fetchBalanceSummary } from '@/store/slices/balanceSlice'
-import { fetchExpensesSummary } from '@/store/slices/expensesSummarySlice'
-import { fetchBudgetSummary } from '@/store/slices/budgetSummarySlice'
-import { fetchAnalytics } from '@/store/slices/analyticsSlice'
+import { addExpense } from '@/store/slices/dashboard/expensesSlice'
+import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
+import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
+import { fetchBudgetSummary } from '@/store/slices/dashboard/budgetSummarySlice'
+import { fetchAnalytics } from '@/store/slices/dashboard/analyticsSlice'
 import { creditCategories, debitCategories } from '../../utils/helper'
 
 const AddExpenseModel = () => {
@@ -128,7 +128,7 @@ const AddExpenseModel = () => {
     <Sheet open={isOpen} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-3xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
+        className="w-[95vw] max-w-3xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit}>
           <SheetHeader className='py-2 px-0'>

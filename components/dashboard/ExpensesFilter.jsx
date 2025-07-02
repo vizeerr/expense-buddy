@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setFilters } from '@/store/slices/expensesSlice'
+import { setFilters } from '@/store/slices/dashboard/expensesSlice'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {

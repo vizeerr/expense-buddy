@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
-import {fetchExpenses} from "@/store/slices/expensesSlice"
+import {fetchExpenses} from "@/store/slices/dashboard/expensesSlice"
 
 import {
   ArrowDownRight,
@@ -45,9 +45,11 @@ import axios from 'axios';
 
 import {
   deleteExpense as deleteExpenseAction
-} from "@/store/slices/expensesSlice"
+} from "@/store/slices/dashboard/expensesSlice"
 import { Button } from '../ui/button';
-import { setFilters } from '@/store/slices/expensesSlice'
+import { setFilters } from '@/store/slices/dashboard/expensesSlice'
+import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
+import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
 
 const debitCategoryIcons = {
   food: Utensils,
@@ -78,10 +80,9 @@ const getIconForExpense = (type, category) => {
 
 const ExpenseItem = ({ expense }) => {
   const dispatch = useDispatch()
-
   const Icon = getIconForExpense(expense.type, expense.category)
   const date = new Date(expense.datetime)
-  const formattedDate = !isNaN(date) ? format(date, 'PPpp') : 'Invalid Date'
+  const formattedDate = !isNaN(date) ? format(date, 'PPp') : 'Invalid Date'
 
   const handleDelete = async () => {
     const toastId = toast.loading("Moving to trash...")
@@ -116,9 +117,12 @@ const ExpenseItem = ({ expense }) => {
     try {
       const res = await axios.put(`/api/expenses/restore-expenses/${expense._id}`)
       if(res.status==200){
+        dispatch(setFilters({ search: '', type: '', category: '', trashed: "true" }))
         dispatch(fetchExpenses({ page: 1 }))
+        dispatch(fetchBalanceSummary())
+        dispatch(fetchExpensesSummary())
+    
         toast.success("Restored successfully")
-        dispatch(setFilters({ search: '', type: '', category: '', trashed: "false" }))
         toast.success((t) => (
           <span className="flex items-center gap-2">
             Restoring from <b>Trash</b>
@@ -132,53 +136,43 @@ const ExpenseItem = ({ expense }) => {
   }
 
   return (
-    <div className={`${expense.trashed? "bg-neutral-800":"bg-black"}  md:hover:scale-[1.015] transition cursor-pointer flex items-center justify-between md:py-4 md:px-4 py-2.5 px-3 md:rounded-2xl rounded-xl`}>
+    <div className={`${expense.trashed? "bg-neutral-800":"bg-black"}  md:hover:scale-[1.015] transition cursor-pointer flex items-center justify-between md:py-4 md:px-4 py-3 px-4 md:rounded-2xl rounded-xl`}>
       {/* Icon */}
-      <div className="flex md:gap-4 gap-2 items-center">
-        <div
-          className={`${
-            expense.type === 'debit'
-              ? 'text-red-500 bg-red-950'
-              : 'text-green-500 bg-green-950'
-          } p-2 md:w-10 md:h-10 w-10 h-10 rounded-md border flex items-center justify-center`}
-        >
-          <Icon className="w-6 h-6" />
-        </div>
-      </div>
+      <div className='flex-col flex gap-3 w-full'>
 
-      {/* Info */}
-      <div className="flex-grow ml-4">
-        <div className="flex flex-col ">
-          <p className="text-sm font-semibold capitalize">{expense.title}</p>
-          <p className="text-xs text-neutral-400 capitalize">
-            {expense.description?.length > 10
-              ? expense.description.slice(0, 10) + '...'
-              : expense.description}
-          </p>
-        </div>
-        <p className="text-xs text-neutral-400">{formattedDate}</p>
-      </div>
+        <div className='flex'>
 
-      {/* Category & Amount */}
-      <div className="flex md:flex-row flex-col items-center md:gap-5 gap-2">
-        <div className="md:px-4 px-2.5 md:py-1.5 py-1 rounded-full border md:text-xs text-[0.65rem] capitalize font-semibold">
-          {expense.category}
-        </div>
-        <p
-          className={`text-base font-semibold flex gap-1 items-center flex-shrink-0 ${
-            expense.type === 'debit' ? 'text-red-500' : 'text-green-500'
-          }`}
-        >
-          {expense.type === 'debit' ? '-' : '+'}₹ {expense.amount}
-          {expense.type === 'debit' ? (
-            <ArrowDownRight className="w-4" />
-          ) : (
-            <ArrowUpRight className="w-4" />
-          )}
-        </p>
-      </div>
+    
+          <div className="flex md:gap-4 gap-2 items-center">
+            <div
+              className={`${
+                expense.type === 'debit'
+                  ? 'text-red-500 bg-red-950'
+                  : 'text-green-500 bg-green-950'
+              } p-2 md:w-10 md:h-12 w-11 h-11 rounded-md border flex items-center justify-center`}
+            >
+              <Icon className="w-8 h-8" />
+            </div>
+          </div>
 
-      {/* Dropdown */}
+          {/* Info */}
+          <div className="flex-grow ml-4 ">
+            <div className="flex flex-col ">
+              <p className="text-base font-semibold capitalize">
+                {expense.title?.length > 18
+                  ? expense.title.slice(0, 18) + '...'
+                  : expense.title}
+              </p>
+              <p className="text-sm text-neutral-400 capitalize">
+                {expense.description?.length > 25
+                  ? expense.description.slice(0, 25) + '..'
+                  : expense.description}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-400">{formattedDate}</p>
+          </div>
+
+          {/* Dropdown */}
       {
         expense.trashed ?  (
           <Undo2 onClick={restoreExpense} className="ms-2 w-5 h-5 text-neutral-300 hover:text-white cursor-pointer"/>
@@ -207,6 +201,32 @@ const ExpenseItem = ({ expense }) => {
 
         )
       }
+         
+        </div>
+      
+
+      {/* Category & Amount */}
+      <div className="flex flex-row items-center justify-between w-full gap-2">
+        <div className="md:px-4 px-2.5 md:py-1.5 py-1 rounded-full border text-xs capitalize font-semibold">
+          {expense.category}
+        </div>
+        <p
+          className={`text-base font-semibold flex gap-1 items-center flex-shrink-0 ${
+            expense.type === 'debit' ? 'text-red-500' : 'text-green-500'
+          }`}
+        >
+          {expense.type === 'debit' ? '-' : '+'}₹ {expense.amount}
+          {expense.type === 'debit' ? (
+            <ArrowDownRight className="w-4" />
+          ) : (
+            <ArrowUpRight className="w-4" />
+          )}
+        </p>
+      </div>
+        
+      </div>
+
+      
       
     </div>
   )

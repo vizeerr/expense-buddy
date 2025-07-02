@@ -7,6 +7,8 @@ export const fetchGroups = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await axios.get('/api/groups/get-groups')
+      console.log(res);
+      
       return res.data.groups || []
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch groups')

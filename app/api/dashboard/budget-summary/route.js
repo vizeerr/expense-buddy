@@ -29,7 +29,7 @@ export async function GET() {
 
     const userEmail = decoded.email
     const [expenses, user] = await Promise.all([
-      Expense.find({ userEmail }),
+      Expense.find({ userEmail, trashed: { $ne: true } }), // ✅ Ignore trashed expenses
       User.findOne({ email: userEmail })
     ])
 
@@ -57,11 +57,10 @@ export async function GET() {
       .reduce((sum, e) => sum + e.amount, 0)
 
     const remainingBudget = Math.max(monthlyBudget - usedBudget, 0)
-
     const dailyAverage = usedBudget / daysUsed
+
     const lastMonthDate = new Date()
     lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
-
     const lastMonth = getMonth(lastMonthDate)
     const lastYear = getYear(lastMonthDate)
 
@@ -113,7 +112,7 @@ export async function GET() {
         remainingBudget,
         goalProgress: Number(goalProgress),
         daysLeft,
-        mostExpendedCategory,  // { name: 'food', amount: 4000 }
+        mostExpendedCategory,
         totalCredit,
         totalDebit,
         totalBalance,

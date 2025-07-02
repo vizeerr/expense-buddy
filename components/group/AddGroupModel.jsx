@@ -16,7 +16,7 @@ import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
 import { useDispatch, useSelector } from 'react-redux'
 import { closeAddGroup } from '@/store/slices/uiSlice'
-import { createGroup } from '@/store/slices/groupSlice'
+import { createGroup } from '@/store/slices/group/groupSlice'
 import toast from 'react-hot-toast'
 
 const AddGroupModal = () => {

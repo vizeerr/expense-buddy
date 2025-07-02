@@ -1,3 +1,4 @@
+// app/api/groups/[id]/details/route.ts
 import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
@@ -7,8 +8,9 @@ import Group from '@/lib/models/Group'
 
 export async function GET(req, { params }) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const token = cookieStore.get('authToken')?.value
+    const { id } = await params
 
     if (!token) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
@@ -24,19 +26,17 @@ export async function GET(req, { params }) {
 
     await dbConnect()
 
-    const group = await Group.findById(params.id)
-      .populate('createdBy', 'name email image')
-      .populate('members.user', 'name email image')
+    const group = await Group.findById(id)
+      .populate('members.user', 'name email image') // only if you're using ref
       .lean()
 
     if (!group) {
       return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
     }
 
-    // Optional: Ensure user is part of group
-    const isMember = group.members.some(
-      (member) => member.user.email === decoded.email
-    )
+    const isMember =
+      group.admin === decoded.email ||
+      group.members?.some((m) => m.user?.email === decoded.email)
 
     if (!isMember) {
       return NextResponse.json({ success: false, message: 'Access denied' }, { status: 403 })

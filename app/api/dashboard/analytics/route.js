@@ -1,4 +1,3 @@
-// /app/api/dashboard/analytics/route.js
 import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
@@ -6,9 +5,9 @@ import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
 
 const getWeekNumber = (date) => {
-  const start = new Date(date.getFullYear(), 0, 1);
-  const diff = ((date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000));
-  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)) + 1;
+  const start = new Date(date.getFullYear(), 0, 1)
+  const diff = ((date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000))
+  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000)) + 1
 }
 
 export async function GET() {
@@ -30,11 +29,14 @@ export async function GET() {
 
     await dbConnect()
     const userEmail = decoded.email
-    const expenses = await Expense.find({ userEmail })
+
+    // ✅ Only non-trashed expenses
+    const expenses = await Expense.find({
+      userEmail,
+      trashed: { $ne: true }
+    })
 
     const now = new Date()
-    // const month = now.getMonth()
-    // const year = now.getFullYear()
 
     // 1️⃣ Account Balance Trend (Line Chart)
     const balanceTrend = Array.from({ length: 4 }, (_, i) => {
@@ -58,7 +60,9 @@ export async function GET() {
       startOfWeek.setDate(now.getDate() - (7 * (3 - i)))
       const week = getWeekNumber(startOfWeek)
 
-      const weeklyTxns = expenses.filter(e => getWeekNumber(new Date(e.datetime)) === week && e.type === 'debit')
+      const weeklyTxns = expenses.filter(e =>
+        getWeekNumber(new Date(e.datetime)) === week && e.type === 'debit'
+      )
       const total = weeklyTxns.reduce((sum, e) => sum + e.amount, 0)
 
       return {
@@ -68,13 +72,12 @@ export async function GET() {
     })
 
     // 3️⃣ Budget Utilization (Area Chart)
-    const areaData = Array.from({ length: 4 }, (_, i) => {
+    const budgetUtilization = Array.from({ length: 4 }, (_, i) => {
       const weekStart = new Date()
       weekStart.setDate(now.getDate() - (7 * (3 - i)))
       const week = getWeekNumber(weekStart)
 
       const txns = expenses.filter(e => getWeekNumber(new Date(e.datetime)) === week)
-
       const income = txns.filter(e => e.type === 'credit').reduce((sum, e) => sum + e.amount, 0)
       const expense = txns.filter(e => e.type === 'debit').reduce((sum, e) => sum + e.amount, 0)
 
@@ -97,10 +100,10 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-       balanceTrend,
-  expensePattern,
-  budgetUtilization: areaData,
-  categoryWise,
+        balanceTrend,
+        expensePattern,
+        budgetUtilization,
+        categoryWise,
       },
     })
   } catch (err) {

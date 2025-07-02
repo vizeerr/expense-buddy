@@ -15,7 +15,7 @@ const GroupSchema = z.object({
 
 export async function POST(req) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const token = cookieStore.get('authToken')?.value
 
     if (!token) {

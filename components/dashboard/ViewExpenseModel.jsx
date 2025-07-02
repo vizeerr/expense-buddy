@@ -26,14 +26,14 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import {
   deleteExpense as deleteExpenseAction
-} from "@/store/slices/expensesSlice"
+} from "@/store/slices/dashboard/expensesSlice"
 
 import {
   closeViewExpense,
   openEditExpense,
 } from "@/store/slices/uiSlice"
 import { filterExpenses } from '@/utils/helper'
-import {fetchExpenses} from "@/store/slices/expensesSlice"
+import {fetchExpenses} from "@/store/slices/dashboard/expensesSlice"
 
 const ViewExpenseModel = () => {
   const dispatch = useDispatch()
@@ -97,7 +97,7 @@ const ViewExpenseModel = () => {
       <Sheet open={viewExpense.open} onOpenChange={() => dispatch(closeViewExpense())}>
         <SheetContent
           side="bottom"
-          className="w-[95vw] max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
+          className="w-[95vw] max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
         >
           <SheetHeader className="px-0">
             <SheetTitle className="text-sm text-neutral-500">Detailed View</SheetTitle>

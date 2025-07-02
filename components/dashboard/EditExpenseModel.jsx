@@ -32,9 +32,9 @@ import { format } from "date-fns"
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateExpense } from '@/store/slices/expensesSlice'
+import { updateExpense } from '@/store/slices/dashboard/expensesSlice'
 import { filterExpenses } from '@/utils/helper'
-import { fetchExpensesSummary } from '@/store/slices/expensesSummarySlice'
+import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
 import { closeEditExpense } from '@/store/slices/uiSlice'
 
 const EditExpenseModel = () => {
@@ -137,7 +137,7 @@ const EditExpenseModel = () => {
     <Sheet open={editExpense.open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-3xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
+        className="w-[95vw] max-w-3xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit}>
           <SheetHeader className="px-0 py-2">

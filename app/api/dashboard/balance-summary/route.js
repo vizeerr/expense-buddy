@@ -13,7 +13,6 @@ const getStartOfWeek = (date) => {
   const diff = d.getDate() - day + (day === 0 ? -6 : 1) // Monday as first day
   return new Date(d.setDate(diff))
 }
-
 const isSameDay = (d1, d2) =>
   d1.getFullYear() === d2.getFullYear() &&
   d1.getMonth() === d2.getMonth() &&
@@ -38,7 +37,9 @@ export async function GET() {
 
     await dbConnect()
     const userEmail = decoded.email
-    const expenses = await Expense.find({ userEmail })
+
+    // ✅ Fetch only non-trashed expenses
+    const expenses = await Expense.find({ userEmail, trashed: { $ne: true } })
 
     const now = new Date()
     const thisMonth = getMonth(now)
@@ -106,7 +107,6 @@ export async function GET() {
     // 📆 Last Month
     const lastMonthDate = new Date()
     lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
-
     const lastMonth = getMonth(lastMonthDate)
     const lastYear = getYear(lastMonthDate)
 

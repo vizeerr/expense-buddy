@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchGroups } from '@/store/slices/groupSlice'
-import GroupList from '@/components/dashboard/GroupList'
+import { fetchGroups } from '@/store/slices/group/groupSlice'
+import GroupList from '@/components/group/GroupList'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import {openAddGroup} from "@/store/slices/uiSlice"

@@ -3,7 +3,7 @@ import AddExpenseModel from '../../../components/dashboard/AddExpenseModel'
 import EditBudgetModel from '../../../components/dashboard/EditBudgetModel'
 import ViewExpenseModel from '../../../components/dashboard/ViewExpenseModel'
 import EditExpenseModel from '../../../components/dashboard/EditExpenseModel'
-import AddGroupModal from '../../../components/dashboard/AddGroupModel'
+import AddGroupModal from '../../../components/group/AddGroupModel'
 
 const layout = ({children}) => {
   return (

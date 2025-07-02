@@ -9,7 +9,7 @@ import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import ViewExpenseModel from './ViewExpenseModel'
 import ExpenseItem from './ExpenseItem' // ✅ import here
-import { fetchExpenses } from '@/store/slices/expensesSlice'
+import { fetchExpenses } from '@/store/slices/dashboard/expensesSlice'
 
 const ExpensesShortcuts = () => {
   const dispatch = useDispatch()
@@ -18,7 +18,7 @@ const ExpensesShortcuts = () => {
     dispatch(fetchExpenses({ page: 1 }))
   }, [dispatch])
   
-  const visibleExpenses = expenses.slice(0, 10)
+  const visibleExpenses = expenses.slice(0, 5)
 
   return (
     <>
@@ -47,7 +47,7 @@ const ExpensesShortcuts = () => {
             {loading ? (
               Array(5)
                 .fill(0)
-                .map((_, i) => <Skeleton key={i} className="w-full h-[72px] rounded-xl" />)
+                .map((_, i) => <Skeleton key={i} className="w-full h-[120px] rounded-xl" />)
             ) : (
               visibleExpenses.map((expense) => (
                 <ExpenseItem

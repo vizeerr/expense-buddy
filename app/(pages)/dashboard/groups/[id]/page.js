@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchGroupDetail } from '@/store/slices/groupDetailSlice'
-import GroupDetailCard from '@/components/groups/GroupDetailCard'
-import GroupExpensesList from '@/components/groups/GroupExpensesList'
-import AddGroupExpenseModel from '@/components/groups/AddGroupExpenseModel'
+// import GroupDetailCard from '@/components/groups/GroupDetailCard'
+// import GroupExpensesList from '@/components/groups/GroupExpensesList'
+// import AddGroupExpenseModel from '@/components/groups/AddGroupExpenseModel'
 
 const GroupDetailPage = () => {
   const { id } = useParams()
@@ -24,9 +24,9 @@ const GroupDetailPage = () => {
 
   return (
     <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto py-16 space-y-6">
-      <GroupDetailCard group={group} />
-      <GroupExpensesList groupId={id} />
-      <AddGroupExpenseModel groupId={id} />
+      {/* <GroupDetailCard group={group} /> */}
+      {/* <GroupExpensesList groupId={id} /> */}
+      {/* <AddGroupExpenseModel groupId={id} /> */}
     </div>
   )
 }

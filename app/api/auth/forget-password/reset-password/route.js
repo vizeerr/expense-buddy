@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import bcrypt from 'bcrypt'
 
 import dbConnect from '@/lib/mongodb'
-import User from '@/models/User'
+import User from '@/lib/models/User'
 
 const RESET_PASSWORD_EXPIRY_MINUTES = 15
 

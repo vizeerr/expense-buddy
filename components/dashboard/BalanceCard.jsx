@@ -17,11 +17,12 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDispatch, useSelector } from 'react-redux'
 import { openAddExpense, openAddBudget } from "@/store/slices/uiSlice"
-import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
-import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
-import { fetchBudgetSummary } from '@/store/slices/dashboard/budgetSummarySlice'
-import { fetchAnalytics } from '@/store/slices/dashboard/analyticsSlice'
 import StatItem from "./StateItem"
+import { fetchDashboard } from "../../utils/dashboardFetch"
+import { useLocalCollapse } from '@/hooks/useLocalCollapse'
+import { ChevronDown, ChevronRight } from 'lucide-react'
+
+import { motion, AnimatePresence } from 'framer-motion'
 
 // Utility to format currency
 const currencyFormat = (val) => `₹ ${val?.toLocaleString?.() || '0'}`
@@ -51,12 +52,13 @@ const BalanceCard = () => {
   const { data: expenseData, loading: expenseLoading } = useSelector(state => state.expensesSummary)
   const { data: budgetData, loading: budgetLoading } = useSelector(state => state.budget)
   const { data: analytics, loading: analyticsLoading } = useSelector(state => state.analytics)
+  const [accountCollapse, toggleAccountCollapse] = useLocalCollapse('accounts-card') || "false"
+  const [expenseCollapse, toggleExpenseCollapse] = useLocalCollapse('expense-card') || "false"
+  const [budgetCollapse, toggleBudgetCollapse] = useLocalCollapse('budget-card') || "false"
+
 
   useEffect(() => {
-    dispatch(fetchBalanceSummary())
-    dispatch(fetchExpensesSummary())
-    dispatch(fetchBudgetSummary())
-    dispatch(fetchAnalytics())
+    fetchDashboard(dispatch)
   }, [dispatch])
 
   return (
@@ -64,11 +66,19 @@ const BalanceCard = () => {
       
       {/* --- Accounts Card --- */}
       <Card>
-        <CardHeader className="flex items-center gap-2">
-          <Wallet />
-          <p className="text-xl font-bold">Accounts</p>
-        </CardHeader>
+        <CardHeader
+          onClick={toggleAccountCollapse}
+          className="flex items-center justify-between cursor-pointer "
+        >
+          <div className="flex items-center gap-2">
+            <Wallet />
+            <p className="text-xl font-bold">Accounts</p>
+          </div>
+          {accountCollapse ? <ChevronRight /> : <ChevronDown />}
+         
+      </CardHeader>
         <CardContent className="space-y-5">
+           <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Total Balance</p>
@@ -82,33 +92,56 @@ const BalanceCard = () => {
             </div>
             <p className="text-xs text-muted-foreground font-semibold">This Month</p>
           </div>
-          <div className="grid gap-3">
-            {balanceLoading
-              ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
-              : <>
-                  <StatItem icon={HandCoins} title="Total Credit" subtitle="Income" value={currencyFormat(summary?.totalCredit)} />
-                  <StatItem icon={ArrowDown} title="Total Debit" subtitle="Spendings" value={currencyFormat(summary?.totalDebit)} color="text-red-500" bg="bg-red-950" />
-                  <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(summary?.dailyAverage)} />
-                  <StatItem icon={Percent} title="Savings Rate" subtitle="This Month" value={`${summary?.savingsRate || '0'}%`} />
-                  <StatItem icon={TrendingUp} title="Last Month" subtitle="Balance" value={currencyFormat(summary?.lastMonthBalance)} />
-                </>
-            }
-          </div>
+          <AnimatePresence initial={false}>
+            {!accountCollapse && (
+          <motion.div
+            initial={{ height: 0, opacity: 0,scale:0.9 }}
+            animate={{ height: 'auto', opacity: 1,scale:1 }}
+            exit={{ height: 0, opacity: 0,scale:0.9 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+
+            <div className="grid gap-3">
+              {balanceLoading
+                ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
+                : <>
+                    <StatItem icon={HandCoins} title="Total Credit" subtitle="Income" value={currencyFormat(summary?.totalCredit)} />
+                    <StatItem icon={ArrowDown} title="Total Debit" subtitle="Spendings" value={currencyFormat(summary?.totalDebit)} color="text-red-500" bg="bg-red-950" />
+                    <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(summary?.dailyAverage)} />
+                    <StatItem icon={Percent} title="Savings Rate" subtitle="This Month" value={`${summary?.savingsRate || '0'}%`} />
+                    <StatItem icon={TrendingUp} title="Last Month" subtitle="Balance" value={currencyFormat(summary?.lastMonthBalance)} />
+                  </>
+              }
+            </div>
+            </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
 
       {/* --- Expenses Card --- */}
       <Card>
-        <CardHeader className="flex justify-between items-center">
+        
+        <CardHeader
+          onClick={toggleExpenseCollapse}
+          className="flex items-center justify-between cursor-pointer"
+        >
           <div className="flex gap-2 items-center">
             <Wallet />
             <p className="text-xl font-bold">Expenses</p>
           </div>
+          <div className="flex gap-4 items-center">
           <Button size="sm" onClick={() => dispatch(openAddExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
           </Button>
+
+          {expenseCollapse ? <ChevronRight /> : <ChevronDown />}
+          </div>
         </CardHeader>
+
         <CardContent className="space-y-5">
+           <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Total Expenses</p>
@@ -119,6 +152,16 @@ const BalanceCard = () => {
             </div>
             <p className="text-xs font-semibold text-muted-foreground">This Month</p>
           </div>
+          <AnimatePresence initial={false}>
+            {!expenseCollapse && (
+          <motion.div
+            initial={{ height: 0, opacity: 0,scale:0.9 }}
+            animate={{ height: 'auto', opacity: 1,scale:1 }}
+            exit={{ height: 0, opacity: 0,scale:0.9 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+
           <div className="grid gap-3">
             {expenseLoading
               ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
@@ -131,21 +174,33 @@ const BalanceCard = () => {
                 </>
             }
           </div>
+          </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
+        
       </Card>
 
       {/* --- Budget Card --- */}
       <Card>
-        <CardHeader className="flex justify-between items-center">
+        <CardHeader
+          onClick={toggleBudgetCollapse}
+          className="flex items-center justify-between cursor-pointer"
+        >
           <div className="flex gap-2 items-center">
             <BadgeDollarSign />
             <p className="text-xl font-bold">Budget</p>
           </div>
-          <Button size="sm" onClick={() => dispatch(openAddBudget())}>
+
+          <div className="flex gap-4 items-center">
+           <Button size="sm" onClick={() => dispatch(openAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
           </Button>
+          {budgetCollapse ? <ChevronRight /> : <ChevronDown />}
+          </div>
         </CardHeader>
         <CardContent className="space-y-5">
+           <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Monthly Budget</p>
@@ -155,6 +210,16 @@ const BalanceCard = () => {
             </div>
             <p className="text-xs font-semibold text-muted-foreground">This Month</p>
           </div>
+          <AnimatePresence initial={false}>
+            {!budgetCollapse && (
+          <motion.div
+            initial={{ height: 0, opacity: 0,scale:0.9 }}
+            animate={{ height: 'auto', opacity: 1,scale:1 }}
+            exit={{ height: 0, opacity: 0,scale:0.9 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+
           <div className="grid gap-3">
             {budgetLoading
               ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
@@ -167,6 +232,9 @@ const BalanceCard = () => {
                 </>
             }
           </div>
+          </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
 

@@ -6,6 +6,7 @@ import GroupList from '@/components/group/GroupList'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import {openAddGroup} from "@/store/slices/uiSlice"
+
 const GroupsPage = () => {
   const dispatch = useDispatch()
   const { list: groups, loading } = useSelector((state) => state.groups)
@@ -15,7 +16,7 @@ const GroupsPage = () => {
   }, [dispatch])
 
   return (
-    
+    <>
     <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-16 space-y-6 ">
       <div className='bg-neutral-900 p-6 rounded-2xl border'>
         <div className='flex justify-between items-center pb-6'>
@@ -27,9 +28,10 @@ const GroupsPage = () => {
         </div>
         <GroupList groups={groups} loading={loading} />
       </div>
-      
-      
     </div>
+    
+    </>
+      
   )
 }
 

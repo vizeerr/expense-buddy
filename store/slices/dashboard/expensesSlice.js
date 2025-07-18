@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // Async thunk to fetch expenses with filters & pagination
 export const fetchExpenses = createAsyncThunk(
   'expenses/fetchExpenses',
-  async ({ page = 1, limit = 10, search = '', type = '', category = '', trashed = "false" }, thunkAPI) => {
+  async ({ page = 1, limit = 10, search = '', type = '', category = '', paymentMethod = '', trashed = "false" }, thunkAPI) => {
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -11,6 +11,7 @@ export const fetchExpenses = createAsyncThunk(
         ...(search && { search }),
         ...(type && { type }),
         ...(category && { category }),
+        ...(paymentMethod && { paymentMethod }),
         trashed: String(trashed), // 🧠 Always explicitly include trashed filter
       })
 
@@ -41,6 +42,7 @@ const expensesSlice = createSlice({
       search: '',
       type: '',
       category: '',
+      paymentMethod: '',
       trashed: "false", // 🔍 Show active expenses by default
     },
   },

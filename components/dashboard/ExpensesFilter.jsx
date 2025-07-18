@@ -21,21 +21,23 @@ const ExpenseFilters = () => {
   const [search, setSearch] = useState(filters.search || '')
   const [type, setType] = useState(filters.type || '')
   const [category, setCategory] = useState(filters.category || '')
-  const [trashed, setTrashed] = useState(filters.trashed || '')
+  const [trashed, setTrashed] = useState(filters.trashed || 'false')
+  const [paymentMethod, setPaymentMethod] = useState(filters.paymentMethod || '')
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      dispatch(setFilters({ search, type, category, trashed }))
+      dispatch(setFilters({ search, type, category, trashed, paymentMethod }))
     }, 300)
     return () => clearTimeout(debounce)
-  }, [search, type, category, trashed, dispatch])
+  }, [search, type, category, trashed, paymentMethod, dispatch])
 
   const clearFilters = () => {
     setSearch('')
     setType('')
     setCategory('')
-    setTrashed(false)
-    dispatch(setFilters({ search: '', type: '', category: '', trashed: "false" }))
+    setTrashed("false")
+    setPaymentMethod('')
+    dispatch(setFilters({ search: '', type: '', category: '', trashed: "false", paymentMethod:"" }))
   }
 
   return (
@@ -72,6 +74,20 @@ const ExpenseFilters = () => {
           <SelectItem value="others">Others</SelectItem>
         </SelectContent>
       </Select>
+      
+       <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+        <SelectTrigger className="w-full lg:w-[160px]">
+          <SelectValue placeholder="Payment Method" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="upi">UPI</SelectItem>
+          <SelectItem value="cash">Cash</SelectItem>
+          <SelectItem value="card">Card</SelectItem>
+                              <SelectItem value="netbanking">Net Banking</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+        </SelectContent>
+      </Select>
+
 
       <Select value={trashed} onValueChange={setTrashed} default="false">
         <SelectTrigger className="w-full lg:w-[160px]">

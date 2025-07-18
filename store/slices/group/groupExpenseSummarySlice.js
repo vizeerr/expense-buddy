@@ -6,7 +6,7 @@ export const fetchGroupExpenseSummary = createAsyncThunk(
   'groupExpenseSummary/fetchGroupExpenseSummary',
   async (groupId, thunkAPI) => {
     try {
-      const res = await axios.get(`/api/groups/${groupId}/expenses-summary`)
+      const res = await axios.get(`/api/groups/${groupId}/expense-summary`)
       return res.data.data
     } catch (err) {
       return thunkAPI.rejectWithValue(

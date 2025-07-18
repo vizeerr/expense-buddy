@@ -1,13 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import  { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
-import ViewExpenseModel from './ViewExpenseModel'
 import ExpenseItem from './ExpenseItem' // ✅ import here
 import { fetchExpenses } from '@/store/slices/dashboard/expensesSlice'
 
@@ -45,7 +44,7 @@ const ExpensesShortcuts = () => {
 
           <div className="space-y-4">
             {loading ? (
-              Array(5)
+              Array(3)
                 .fill(0)
                 .map((_, i) => <Skeleton key={i} className="w-full h-[120px] rounded-xl" />)
             ) : (

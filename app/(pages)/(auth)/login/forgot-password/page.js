@@ -17,19 +17,41 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useRouter } from 'next/navigation'
+import { z } from 'zod'
+
+const EmailSchema = z.object({
+  email: z.string().email('Enter a valid email'),
+})
+
+const OtpSchema = z.object({
+  otp: z.string().regex(/^\d{6}$/, 'OTP must be a 6-digit number'),
+})
+
+const PasswordSchema = z.object({
+  password: z.string()
+    .min(8, 'At least 8 characters')
+    .regex(/[a-z]/, 'Lowercase letter required')
+    .regex(/[A-Z]/, 'Uppercase letter required')
+    .regex(/\d/, 'Number required')
+    .regex(/[^a-zA-Z0-9]/, 'Special character required'),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword']
+})
 
 export default function ForgetPasswordPage() {
-  const [step, setStep] = useState(1) // 1: email, 2: otp, 3: reset password
+  const [step, setStep] = useState(1)
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [cooldown, setCooldown] = useState(0)
+  const [errors, setErrors] = useState({})
 
   const router = useRouter()
 
-  // Cooldown timer for resend OTP button
   useEffect(() => {
     if (cooldown === 0) return
     const interval = setInterval(() => {
@@ -44,124 +66,115 @@ export default function ForgetPasswordPage() {
     return () => clearInterval(interval)
   }, [cooldown])
 
-  const validateEmail = () => {
-    if (!email) {
-      toast.error('Email is required')
-      return false
+  const extractFieldErrors = (error) => {
+    const res = error?.response?.data
+    if (res?.error && typeof res.error === 'object') {
+      return res.error
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      toast.error('Invalid email format')
-      return false
-    }
-    return true
+    return {}
   }
 
-  const validateOtp = () => {
-    const otpRegex = /^[0-9]{6}$/
-    if (!otpRegex.test(otp)) {
-      toast.error('Enter a valid 6-digit OTP')
-      return false
-    }
-    return true
-  }
-
-  const validatePasswords = () => {
-     const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+])[A-Za-z\d@$!%*?&#^()\-_=+]{8,}$/
-
-    if (!password || !confirmPassword) {
-      toast.error('Both password fields are required')
-      return false
-    }
-    if (password.length < 8) {
-      toast.error('Password must be at least 8 characters')
-      return false
-    }
-
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match')
-      return false
-    }
-    
-    if (!strongPasswordRegex.test(password)) {
-        toast.error('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character')
-        return false
-      }
-
-    return true
-  }
-
-  // Step 1: Send OTP to email
   const handleSendOtp = async (e) => {
     e.preventDefault()
-    if (!validateEmail()) return
+    const result = EmailSchema.safeParse({ email })
+
+    if (!result.success) {
+      setErrors(result.error.flatten().fieldErrors)
+      toast.error('Please fix validation errors')
+      return
+    }
 
     try {
       setLoading(true)
-      const res = await axios.post('/api/auth/login/forgot-password/send-otp', { email })
+      const res = await axios.post('/api/auth/forget-password/send-otp', { email })
       if (res.status === 200) {
         toast.success('OTP sent to your email')
         setStep(2)
         setCooldown(60)
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to send OTP')
+      const fieldErrors = extractFieldErrors(err)
+      setErrors(fieldErrors)
+      const msg = typeof fieldErrors === 'string' ? fieldErrors : 'Failed to send OTP'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
   }
 
-  // Step 2: Verify OTP
   const handleVerifyOtp = async (e) => {
     e.preventDefault()
-    if (!validateOtp()) return
+    const result = OtpSchema.safeParse({ otp })
+
+    if (!result.success) {
+      setErrors(result.error.flatten().fieldErrors)
+      toast.error('Please fix validation errors')
+      return
+    }
 
     try {
       setLoading(true)
-      const res = await axios.post('/api/auth/login/forgot-password/verify-otp', { email, otp })
+      const res = await axios.post('/api/auth/forget-password/verify-otp', { email, otp })
       if (res.status === 200) {
-        toast.success('OTP verified! You can reset your password now.')
+        toast.success('OTP Verified')
         setStep(3)
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'OTP verification failed')
+      const fieldErrors = extractFieldErrors(err)
+      setErrors(fieldErrors)
+      const msg = typeof fieldErrors === 'string' ? fieldErrors : 'OTP verification failed'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
   }
 
-  // Step 3: Reset password
   const handleResetPassword = async (e) => {
     e.preventDefault()
-    if (!validatePasswords()) return
+    const result = PasswordSchema.safeParse({ password, confirmPassword })
+
+    if (!result.success) {
+      setErrors(result.error.flatten().fieldErrors)
+      toast.error('Please fix validation errors')
+      return
+    }
 
     try {
       setLoading(true)
-      const res = await axios.post('/api/auth/login/forgot-password/reset-password', { email, password })
+      const res = await axios.post('/api/auth/forget-password/reset-password', { email, password })
       if (res.status === 200) {
-        toast.success('Password reset successfully! Please login.')
+        toast.success('Password reset successfully!')
         router.push('/login')
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Password reset failed')
+      const fieldErrors = extractFieldErrors(err)
+      setErrors(fieldErrors)
+      const msg = typeof fieldErrors === 'string' ? fieldErrors : 'Password reset failed'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
   }
 
-  // Resend OTP handler
   const handleResendOtp = async () => {
+    
     if (cooldown > 0) return
+
     try {
-      const res = await axios.post('/api/auth/login/forgot-password/send-otp', { email })
+      const res = await axios.post('/api/auth/forget-password/send-otp', { email })
       if (res.status === 200) {
         toast.success('OTP resent to your email')
         setCooldown(60)
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to resend OTP')
+      const fieldErrors = extractFieldErrors(err)
+      setErrors(fieldErrors)
+      const msg = typeof fieldErrors === 'string' ? fieldErrors : 'Failed to resend OTP'
+      toast.error(msg)
     }
+    
   }
+
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4">
@@ -172,7 +185,7 @@ export default function ForgetPasswordPage() {
               <CardTitle className="text-2xl font-semibold my-2">Forgot Password?</CardTitle>
               <CardDescription>Enter your email to receive an OTP.</CardDescription>
               <div className="mt-2">
-                <Button variant="outline" asChild>
+                <Button variant="outline" disabled={loading} asChild>
                   <Link href="/login">Back to Login</Link>
                 </Button>
               </div>
@@ -185,10 +198,15 @@ export default function ForgetPasswordPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setErrors(prev => ({ ...prev, email: null }))
+                    }}
+                    disabled={loading}
                     required
                   />
                 </div>
+                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
               </CardContent>
               <CardFooter className="mt-6">
                 <Button type="submit" disabled={loading} className="w-full font-semibold">
@@ -212,7 +230,10 @@ export default function ForgetPasswordPage() {
             </CardHeader>
             <form onSubmit={handleVerifyOtp}>
               <CardContent className="space-y-4">
-                <InputOTP id="otp" maxLength={6} value={otp} onChange={setOtp} required>
+                <InputOTP id="otp" maxLength={6} onChange={(val) => {
+                  setOtp(val)
+                  setErrors(prev => ({ ...prev, otp: null }))
+                }} disabled={loading} required>
                   <InputOTPGroup maxLength={6}>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
@@ -225,6 +246,7 @@ export default function ForgetPasswordPage() {
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
+                {errors.otp && <p className="text-sm text-red-500">{errors.otp}</p>}
               </CardContent>
               <CardFooter className="mt-6">
                 <Button type="submit" disabled={loading} className="w-full font-semibold">
@@ -249,20 +271,42 @@ export default function ForgetPasswordPage() {
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setErrors(prev => ({ ...prev, password: null }))
+                    }}
+                    disabled={loading}
                     required
                   />
                 </div>
+                {errors.password && Array.isArray(errors.password) && (
+                  <ul className="text-sm text-red-500 space-y-1">
+                    {errors.password.map((msg, idx) => (
+                      <li key={idx}>• {msg}</li>
+                    ))}
+                  </ul>
+                )}
                 <div className="grid gap-2">
                   <Label htmlFor="confirmPassword" className="text-lg">Confirm Password</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value)
+                      setErrors(prev => ({ ...prev, confirmPassword: null }))
+                    }}
+                    disabled={loading}
                     required
                   />
                 </div>
+                {errors.confirmPassword && Array.isArray(errors.confirmPassword) && (
+                  <ul className="text-sm text-red-500 space-y-1">
+                    {errors.confirmPassword.map((msg, idx) => (
+                      <li key={idx}>• {msg}</li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
               <CardFooter className="mt-6">
                 <Button type="submit" disabled={loading} className="w-full font-semibold">

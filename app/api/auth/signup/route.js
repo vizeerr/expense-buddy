@@ -3,116 +3,96 @@ import bcrypt from 'bcrypt'
 import { z } from 'zod'
 import dbConnect from '@/lib/mongodb'
 import User from '@/lib/models/User'
+import { sendMail } from '@/utils/sendMail'
 
 const SignupSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string()
+  .min(3, 'Name must be at least 3 characters')
+  .regex(/^[A-Za-z\s]+$/, 'Name cannot contain numbers or symbols'),
   email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string()
+    .min(8, 'At least 8 characters')
+    .regex(/[a-z]/, 'Lowercase letter required')
+    .regex(/[A-Z]/, 'Uppercase letter required')
+    .regex(/\d/, 'Number required')
+    .regex(/[^a-zA-Z0-9]/, 'Special character required'),
 })
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 export async function POST(req) {
   try {
+    await dbConnect()
+
     const body = await req.json()
     const result = SignupSchema.safeParse(body)
 
     if (!result.success) {
-      const errors = result.error.flatten().fieldErrors
-      return NextResponse.json({ success: false, errors }, { status: 400 })
+      const error = result.error.flatten().fieldErrors
+      return NextResponse.json({ success: false, message: 'Validation error', error }, { status: 400 })
     }
 
     const { name, email, password } = result.data
     const emailLower = email.toLowerCase()
 
-    await dbConnect()
-
     const existingUser = await User.findOne({ email: emailLower })
 
-    // ✅ Case 1: User exists and is already verified
-    if (existingUser && existingUser.emailVerified) {
-      return NextResponse.json({
-        success: false,
-        message: 'Email already registered and verified. Please log in.'
-      }, { status: 409 })
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10)
-    const verifyOtp = generateOTP()
-    const verifyOtpExpiry = new Date(Date.now() + 10 * 60 * 1000)
+    const otp = generateOTP()
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
 
-    // ✅ Case 2: User exists but not verified → Update password + resend OTP
-    if (existingUser && !existingUser.emailVerified) {
-      existingUser.name = name.toLowerCase() // Optional: update name too
-      existingUser.password = hashedPassword
-      existingUser.verifyOtp = verifyOtp
-      existingUser.verifyOtpExpiry = verifyOtpExpiry
-      await existingUser.save()
-
-      // Resend OTP
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyShfo_vXfWxh3hK4miF0ldnL9ZvCV5UislilRTEAMWz6dSA9DrpJlIG1DNGjRdrrjy/exec'
-      const apiKey = 'VIVEKBADBOY!@#$%^&*()1234567890'
-
-      const resendOtpRes = await fetch(scriptURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey
-        },
-        body: JSON.stringify({
-          email: emailLower,
-          otp: verifyOtp,
-          type: 'resend-registration-password-update',
-          apiKey
-        })
-      })
-
-      const resendOtpResult = await resendOtpRes.json()
-      if (resendOtpResult.status !== 'success') {
+    if (existingUser) {
+      // Case: User already verified
+      if (existingUser.emailVerified) {
         return NextResponse.json({
           success: false,
-          message: 'Failed to resend OTP. Please try again.'
+          message: 'Email already registered',
+        }, { status: 409 })
+      }
+
+      // Case: User not verified → update + resend OTP
+      existingUser.name = name.toLowerCase()
+      existingUser.password = hashedPassword
+      existingUser.verifyOtp = otp
+      existingUser.verifyOtpExpiry = otpExpiry
+      await existingUser.save()
+
+      const emailSent = await sendMail('registration', {
+        email: emailLower,
+        otp
+      })
+
+      if (!emailSent) {
+        return NextResponse.json({
+          success: false,
+          message: 'Failed to signup'
         }, { status: 500 })
       }
 
       return NextResponse.json({
         success: true,
-        message: 'Email already exists but was unverified. Password updated and OTP resent.'
+        message: 'Existing unverified account. OTP resent.'
       }, { status: 200 })
     }
 
-    // ✅ Case 3: New user
+    // Case: New user
     const newUser = new User({
       name: name.toLowerCase(),
       email: emailLower,
       password: hashedPassword,
-      verifyOtp,
-      verifyOtpExpiry,
+      verifyOtp: otp,
+      verifyOtpExpiry: otpExpiry,
       emailVerified: false,
     })
 
     await newUser.save()
 
-    // Send OTP to new user
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyShfo_vXfWxh3hK4miF0ldnL9ZvCV5UislilRTEAMWz6dSA9DrpJlIG1DNGjRdrrjy/exec'
-    const apiKey = 'VIVEKBADBOY!@#$%^&*()1234567890'
-
-    const otpRes = await fetch(scriptURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey
-      },
-      body: JSON.stringify({
-        email: emailLower,
-        otp: verifyOtp,
-        type: 'registration',
-        apiKey
-      })
+    const emailSent = await sendMail('registration', {
+      email: emailLower,
+      otp
     })
 
-    const otpResult = await otpRes.json()
-    if (otpResult.status !== 'success') {
+    if (!emailSent) {
       return NextResponse.json({
         success: false,
         message: 'Failed to send OTP. Please try again.'
@@ -126,6 +106,9 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Signup error:', error)
-    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({
+      success: false,
+      message: 'Internal server error'
+    }, { status: 500 })
   }
 }

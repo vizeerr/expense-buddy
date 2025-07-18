@@ -1,17 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
+import toast from 'react-hot-toast'
 
-// ✅ Async thunk to fetch group balance summary
+// Async thunk to fetch group balance summary
 export const fetchGroupBalanceSummary = createAsyncThunk(
   'groupBalance/fetchGroupBalanceSummary',
-  async (groupId, thunkAPI) => {
+  async (groupId, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`/api/groups/${groupId}/balance-summary`)
-      return res.data.data
+      const res = await fetch(`/api/groups/${groupId}/balance-summary`)
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to fetch group balance summary')
+      }
+      return data.data 
     } catch (err) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'Failed to fetch group balance'
-      )
+      toast.error(err.message)
+      return rejectWithValue(err.message)
     }
   }
 )
@@ -19,12 +23,12 @@ export const fetchGroupBalanceSummary = createAsyncThunk(
 const groupBalanceSlice = createSlice({
   name: 'groupBalance',
   initialState: {
-    summary: null,
     loading: false,
     error: null,
+    summary: null, // groupId -> summary object
   },
   reducers: {
-    clearGroupBalanceSummary(state) {
+    resetGroupBalanceSummary: (state) => {
       state.summary = null
       state.loading = false
       state.error = null
@@ -42,10 +46,9 @@ const groupBalanceSlice = createSlice({
       })
       .addCase(fetchGroupBalanceSummary.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload
+        state.error = action.payload || 'Something went wrong'
       })
   },
 })
 
-export const { clearGroupBalanceSummary } = groupBalanceSlice.actions
 export default groupBalanceSlice.reducer

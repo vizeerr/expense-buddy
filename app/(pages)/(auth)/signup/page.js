@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
 } from '@/components/ui/card'
@@ -11,84 +11,85 @@ import Link from 'next/link'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
+  InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot
 } from "@/components/ui/input-otp"
 import { useRouter } from 'next/navigation'
-export default function RegisterPage() {
+import { z } from 'zod'
 
-  const [form, setForm] = useState({
-    email: '',
-    name: '',
-    password: '',
-    cpassword: ''
-  })
-  const [loading, setLoading] = useState(false)
-  const [showOTP, setShowOTP] = useState(false)
+const RegisterSchema = z.object({
+  email: z.string().email('Invalid email'),
+  name: z.string()
+  .min(3, 'Name must be at least 3 characters')
+  .regex(/^[A-Za-z\s]+$/, 'Name cannot contain numbers or symbols'),
+  password: z.string()
+    .min(8, 'At least 8 characters')
+    .regex(/[a-z]/, 'Lowercase letter required')
+    .regex(/[A-Z]/, 'Uppercase letter required')
+    .regex(/\d/, 'Number required')
+    .regex(/[^a-zA-Z0-9]/, 'Special character required'),
+  cpassword: z.string()
+}).refine(data => data.password === data.cpassword, {
+  message: 'Passwords do not match',
+  path: ['cpassword']
+})
+
+const otpRegex = /^\d{6}$/
+
+export default function RegisterPage() {
+  const [form, setForm] = useState({ email: '', name: '', password: '', cpassword: '' })
+  const [errors, setErrors] = useState({})
   const [otp, setOtp] = useState('')
+  const [showOTP, setShowOTP] = useState(false)
   const [cooldown, setCooldown] = useState(0)
-const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if (cooldown === 0) return
+    const interval = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [cooldown])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value })
-  }
-
-  const validateFields = () => {
-    const { email, name, password, cpassword } = form
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+])[A-Za-z\d@$!%*?&#^()\-_=+]{8,}$/
-
-    if (!email || !name || !password || !cpassword) {
-      toast.error('All fields are required')
-      return false
-    }
-
-    if (!emailRegex.test(email)) {
-      toast.error('Invalid email format')
-      return false
-    }
-
-    if (name.length < 3) {
-      toast.error('Name must be at least 3 characters')
-      return false
-    }
-
-    if (!strongPasswordRegex.test(password)) {
-        toast.error('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character')
-        return false
-      }
-
-    if (password !== cpassword) {
-      toast.error('Passwords do not match')
-      return false
-    }
-
-    return true
+    setErrors(prev => ({ ...prev, [e.target.id]: null }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!validateFields()) return
+    const result = RegisterSchema.safeParse(form)
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors
+      setErrors(fieldErrors)
+      toast.error('Please fix the errors')
+      return
+    }
 
     try {
       setLoading(true)
       const res = await axios.post('/api/auth/signup', {
         email: form.email,
         name: form.name,
-        password: form.password
+        password: form.password,
       })
-      if(res.status==200){ 
+
+      if (res.status === 200) {
         toast.success('OTP sent to your email')
         setShowOTP(true)
+        setCooldown(60)
       }
     } catch (err) {
-      console.error(err)
-      const msg = err?.response?.data?.message || 'Something went wrong'
-      toast.error(msg)
+      toast.error(err?.response?.data?.message || 'Signup failed')
     } finally {
       setLoading(false)
     }
@@ -96,15 +97,8 @@ const router = useRouter()
 
   const handleOTPSubmit = async (e) => {
     e.preventDefault()
-    const otpRegex = /^[0-9]{6}$/; // exactly 6 alphanumeric chars
-
     if (!otpRegex.test(otp)) {
-      toast.error('OTP must only contains numbers');
-      return;
-    }
-
-    if (!otp || otp.length !== 6) {
-      toast.error('Enter valid 6-digit OTP')
+      toast.error('Enter a valid 6-digit OTP')
       return
     }
 
@@ -114,45 +108,34 @@ const router = useRouter()
         email: form.email,
         otp
       })
-      if(res.status==200){
-        toast.success('Account registered successfully!')
-        setShowOTP(false)
-        setOtp('')
+
+      if (res.status === 200) {
+        toast.success('Account verified! Please login.')
         setForm({ email: '', name: '', password: '', cpassword: '' })
+        setOtp('')
+        setShowOTP(false)
         router.push('/login')
       }
-      
     } catch (err) {
-      console.error(err)
       toast.error(err?.response?.data?.message || 'OTP verification failed')
     } finally {
       setLoading(false)
     }
   }
-  const handleResendOTP = async () => {
-    try {
-      const res = await axios.post('/api/auth/signup/resend-otp', {
-        email: form.email,
-      })
 
-    if (res.status === 200) {
-      toast.success('OTP resent successfully!')
-      setCooldown(60)
-      const interval = setInterval(() => {
-        setCooldown(prev => {
-          if (prev <= 1) {
-            clearInterval(interval)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+  const handleResendOTP = async () => {
+    if (cooldown > 0) return
+
+    try {
+      const res = await axios.post('/api/auth/signup/resend-otp', { email: form.email })
+      if (res.status === 200) {
+        toast.success('OTP resent')
+        setCooldown(60)
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to resend OTP')
     }
-  } catch (err) {
-    console.error(err)
-    toast.error(err?.response?.data?.message || 'Failed to resend OTP')
-  } 
-}
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4">
@@ -169,31 +152,47 @@ const router = useRouter()
               </div>
             </CardHeader>
 
-            <form onSubmit={handleSubmit} className=''>
+            <form onSubmit={handleSubmit}>
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email" className="text-lg">Email</Label>
-                  <Input id="email" type="email" placeholder="m@example.com" value={form.email} onChange={handleChange} required />
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={form.email} onChange={handleChange} disabled={loading} required />
+                  {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="name" className="text-lg">Name</Label>
-                  <Input id="name" type="text" placeholder="Sam Altman" value={form.name} onChange={handleChange} required />
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" type="text" value={form.name} onChange={handleChange} disabled={loading} required />
+                  <ul className="text-sm text-red-500 space-y-1">
+                    {errors.name?.map((msg, idx) => (
+                      <li key={idx}>• {msg}</li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="password" className="text-lg">Password</Label>
-                  <Input id="password" type="password" value={form.password} onChange={handleChange} required />
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={form.password} onChange={handleChange} disabled={loading} required />
+                  <ul className="text-sm text-red-500 space-y-1">
+                    {errors.password?.map((msg, idx) => (
+                      <li key={idx}>• {msg}</li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="cpassword" className="text-lg">Confirm Password</Label>
-                  <Input id="cpassword" type="password" value={form.cpassword} onChange={handleChange} required />
+                  <Label htmlFor="cpassword">Confirm Password</Label>
+                  <Input id="cpassword" type="password" value={form.cpassword} onChange={handleChange} disabled={loading} required />
+                  <ul className="text-sm text-red-500 space-y-1">
+                    {errors.cpassword?.map((msg, idx) => (
+                      <li key={idx}>• {msg}</li>
+                    ))}
+                  </ul>
                 </div>
               </CardContent>
 
               <CardFooter className="mt-6">
-                <Button type="submit" className="w-full font-semibold" disabled={loading}>
+                <Button type="submit" disabled={loading} className="w-full font-semibold">
                   {loading ? 'Creating Account...' : 'Register Account'}
                 </Button>
               </CardFooter>
@@ -204,22 +203,17 @@ const router = useRouter()
             <CardHeader>
               <CardTitle className="text-2xl font-semibold my-2">Verify OTP</CardTitle>
               <CardDescription className="flex items-center justify-between">
-                <span>Enter the 6-digit OTP sent to: <br/> <b>{form.email}</b></span>
-           
-                <Button variant="outline" onClick={handleResendOTP}
-                  disabled={cooldown > 0}>
+                <span>Enter the 6-digit OTP sent to <b>{form.email}</b></span>
+                <Button variant="outline" onClick={handleResendOTP} disabled={cooldown > 0}>
                   {cooldown > 0 ? `Resend OTP in ${cooldown}s` : 'Resend OTP'}
                 </Button>
-           
               </CardDescription>
             </CardHeader>
 
             <form onSubmit={handleOTPSubmit}>
               <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                  
-                  <InputOTP id="otp" maxLength={6} value={otp} onChange={(value) => setOtp(value)} required>
-                  <InputOTPGroup maxLength={6}>
+                <InputOTP id="otp" maxLength={6} value={otp} onChange={setOtp} disabled={loading} required>
+                  <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
                     <InputOTPSlot index={2} />
@@ -231,12 +225,10 @@ const router = useRouter()
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-
-                </div>
               </CardContent>
 
               <CardFooter className="py-4">
-                <Button  type="submit" className="w-full font-semibold" disabled={loading}>
+                <Button type="submit" className="w-full font-semibold" disabled={loading}>
                   {loading ? 'Verifying...' : 'Verify OTP'}
                 </Button>
               </CardFooter>
@@ -244,7 +236,6 @@ const router = useRouter()
           </>
         )}
       </Card>
-      
     </div>
   )
 }

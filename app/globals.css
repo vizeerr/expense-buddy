@@ -124,3 +124,8 @@
 .trans{
   transition: 0.2s ease-in-out;
 }
+
+/* Hide default × close button in open Sheet */
+[data-state="open"] > button.absolute.right-4.top-4 {
+  display: none !important;
+}

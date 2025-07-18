@@ -1,120 +1,105 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
-
+import { cookies } from 'next/headers'
 import dbConnect from '@/lib/mongodb'
-import Group from '@/lib/models/Group'
 import GroupExpense from '@/lib/models/GroupExpense'
+import Group from '@/lib/models/Group'
 
-const getStartOfWeek = (date) => {
+const getMonth = (date) => new Date(date).getMonth()
+const getYear = (date) => new Date(date).getFullYear()
+const getWeek = (date) => {
   const d = new Date(date)
-  const day = d.getDay()
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-  return new Date(d.setDate(diff))
+  const start = new Date(d.getFullYear(), 0, 1)
+  const diff = d - start + (start.getTimezoneOffset() - d.getTimezoneOffset()) * 60000
+  return Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
 }
 
 export async function GET(req, { params }) {
   try {
-    const { id } = await params
+    const { id: groupId } = await params
     const cookieStore = await cookies()
     const token = cookieStore.get('authToken')?.value
 
     if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ success: false, message: 'Unauthorized: No token' }, { status: 401 })
     }
 
     let decoded
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
-      console.log(err)
+      console.log(err);
+      
       return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 })
     }
 
-    const userEmail = decoded.email
     await dbConnect()
 
-    const group = await Group.findById(id)
-      .populate('members.user', 'email')
-      .lean()
+    const userId = decoded._id
+    const group = await Group.findById(groupId).lean()
 
     if (!group) {
       return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
     }
 
-    const isMember = group.members.some(m => m.user?.email === userEmail)
+    const isMember = group.members.some(m => m.user.toString() === userId)
     if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Access denied' }, { status: 403 })
+      return NextResponse.json({ success: false, message: 'Forbidden: Not a group member' }, { status: 403 })
     }
 
-    // ✅ Fetch non-trashed group expenses
-    const allExpenses = await GroupExpense.find({
-      groupId: id,
+    // ✅ Fetch non-trashed debit expenses only
+    const expenses = await GroupExpense.find({
+      groupId,
+      type: 'debit',
       trashed: { $ne: true }
-    }).lean()
-
-    const now = new Date()
-    const thisMonth = now.getMonth()
-    const thisYear = now.getFullYear()
-
-    const monthTxns = allExpenses.filter(e => {
-      const d = new Date(e.datetime)
-      return d.getMonth() === thisMonth && d.getFullYear() === thisYear
     })
 
-    const totalMonthlyExpense = monthTxns.reduce((sum, e) => sum + e.amount, 0)
+    const now = new Date()
+    const thisMonth = getMonth(now)
+    const thisYear = getYear(now)
+    const thisWeek = getWeek(now)
 
-    const daysUsed = new Set(monthTxns.map(e => new Date(e.datetime).toDateString())).size || 1
-    const dailyAverage = totalMonthlyExpense / daysUsed
+    let totalMonthlyExpense = 0
+    let totalWeeklyExpense = 0
+    let pastSixMonthTotals = Array(6).fill(0)
 
-    const weeks = {}
-    for (const txn of monthTxns) {
-      const d = new Date(txn.datetime)
-      const weekStart = getStartOfWeek(d).toDateString()
-      weeks[weekStart] = (weeks[weekStart] || 0) + txn.amount
-    }
+    const thisMonthTxns = expenses.filter(e => {
+      const d = new Date(e.datetime)
+      return getMonth(d) === thisMonth && getYear(d) === thisYear
+    })
 
-    const weeklyValues = Object.values(weeks)
-    const weeklyAverage = weeklyValues.length
-      ? weeklyValues.reduce((a, b) => a + b, 0) / weeklyValues.length
-      : 0
+    const daysUsed = new Set(thisMonthTxns.map(e => new Date(e.datetime).toDateString())).size || 1
+    const dailyAverage = thisMonthTxns.reduce((sum, e) => sum + e.amount, 0) / daysUsed
 
-    const totalWeeklyExpense = weeklyValues.slice(-1)[0] || 0
+    for (let txn of expenses) {
+      const date = new Date(txn.datetime)
 
-    const months = {}
-    for (const txn of allExpenses) {
-      const d = new Date(txn.datetime)
-      const key = `${d.getFullYear()}-${d.getMonth()}`
-      months[key] = (months[key] || 0) + txn.amount
-    }
+      if (getMonth(date) === thisMonth && getYear(date) === thisYear) {
+        totalMonthlyExpense += txn.amount
+      }
 
-    const monthlyValues = Object.values(months)
-    const monthlyAverage = monthlyValues.length
-      ? monthlyValues.reduce((a, b) => a + b, 0) / monthlyValues.length
-      : 0
+      if (getWeek(date) === thisWeek && getYear(date) === thisYear) {
+        totalWeeklyExpense += txn.amount
+      }
 
-    const categoryMap = {}
-    for (const txn of monthTxns) {
-      if (!txn.category?.name) continue
-      const key = txn.category.name
-      categoryMap[key] = {
-        name: key,
-        amount: (categoryMap[key]?.amount || 0) + txn.amount,
+      const monthDiff = (thisYear - date.getFullYear()) * 12 + (thisMonth - date.getMonth())
+      if (monthDiff >= 0 && monthDiff < 6) {
+        pastSixMonthTotals[5 - monthDiff] += txn.amount
       }
     }
 
-    const mostExpendedCategory = Object.values(categoryMap).sort((a, b) => b.amount - a.amount)[0] || null
+    const monthlyAverage = pastSixMonthTotals.reduce((a, b) => a + b, 0) / 6
+    const weeklyAverage = totalMonthlyExpense / 4.3 // approx 4.3 weeks per month
 
     return NextResponse.json({
       success: true,
       data: {
         totalMonthlyExpense,
+        totalWeeklyExpense,
         dailyAverage: Number(dailyAverage.toFixed(2)),
         weeklyAverage: Number(weeklyAverage.toFixed(2)),
         monthlyAverage: Number(monthlyAverage.toFixed(2)),
-        totalWeeklyExpense,
-        mostExpendedCategory,
-      },
+      }
     })
   } catch (err) {
     console.error('[GROUP_EXPENSE_SUMMARY_ERROR]', err)

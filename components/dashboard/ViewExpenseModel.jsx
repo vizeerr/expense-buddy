@@ -19,6 +19,9 @@ import {
   Tag,
   Type,
   StickyNote,
+  TypeIcon,
+  HandHelping,
+  ArrowLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import EditExpenseModel from './EditExpenseModel'
@@ -99,9 +102,14 @@ const ViewExpenseModel = () => {
           side="bottom"
           className="w-[95vw] max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
         >
-          <SheetHeader className="px-0">
-            <SheetTitle className="text-sm text-neutral-500">Detailed View</SheetTitle>
-            <SheetDescription />
+          
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Detailed View</SheetTitle>
           </SheetHeader>
 
           {/* Expense Detail Card */}
@@ -139,6 +147,11 @@ const ViewExpenseModel = () => {
                 <IndianRupee className="w-4 h-4 text-emerald-500" />
                 <span className="font-medium">Amount:</span> ₹{expense.amount.toFixed(2)}
               </div>
+              <div className="flex items-center gap-2 capitalize">
+                <HandHelping className="w-4 h-4 text-pink-500" />
+                <span className="font-medium">Payment Method:</span> {expense.paymentMethod || 'N/A'}
+              </div>
+
               <div className="flex items-center gap-2 capitalize">
                 <CalendarDays className="w-4 h-4 text-purple-500" />
                 <span className="font-medium">Date:</span>{' '}

@@ -27,15 +27,59 @@ import {
   PopoverTrigger
 } from "../ui/popover"
 import { Calendar } from "../ui/calendar"
-import { CalendarIcon, Clock } from "lucide-react"
+import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
 import { format } from "date-fns"
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateExpense } from '@/store/slices/dashboard/expensesSlice'
 import { filterExpenses } from '@/utils/helper'
-import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
 import { closeEditExpense } from '@/store/slices/uiSlice'
+import { creditCategories, debitCategories } from '../../utils/helper'
+import { fetchDashboard } from '../../utils/dashboardFetch'
+import { z } from 'zod'
+
+const expenseSchema = z.object({
+  title: z
+    .string({ required_error: 'Title is required' })
+    .min(3, 'Title must be at least 3 characters'),
+
+  description: z.string().optional(),
+
+  amount: z
+    .string({ required_error: 'Amount is required' })
+    .refine((val) => !isNaN(val) && Number(val) > 0, {
+      message: 'Amount must be a positive number',
+    }),
+
+  category: z
+    .string({ required_error: 'Category is required' })
+    .min(1, 'Category is required'),
+
+  type: z
+    .string({ required_error: 'Type is required' })
+    .min(1, 'Type is required') // 🚫 catches empty string
+    .refine((val) => ['credit', 'debit'].includes(val), {
+      message: 'Invalid type',
+    }),
+
+  paymentMethod: z
+    .string({ required_error: 'Payment method is required' })
+    .min(1, 'Payment method  is required') // 🚫 catches empty string
+    .refine((val) => ['upi', 'cash', 'card', 'netbanking', 'other'].includes(val), {
+      message: 'Invalid payment method',
+    }),
+
+  date: z
+  .instanceof(Date, { message: "Invalid date" })
+  .refine((val) => !isNaN(val.getTime()), { message: "Invalid date format" }),
+
+  time: z
+    .string({ required_error: 'Time is required' })
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+      message: 'Invalid time format (HH:mm)',
+    }),
+})
+
 
 const EditExpenseModel = () => {
   const dispatch = useDispatch()
@@ -43,6 +87,8 @@ const EditExpenseModel = () => {
   const expenses = useSelector((state) => state.expenses.list)
   const filtered = filterExpenses(expenses, { _id: editExpense.id })
   const existingExpense = filtered[0]
+  const [errors, setErrors] = useState({})
+  
 
   const [form, setForm] = useState({
     title: '',
@@ -50,8 +96,9 @@ const EditExpenseModel = () => {
     amount: '',
     category: '',
     type: '',
+      paymentMethod: '', 
     date: new Date(),
-    time: '12:00'
+    time: new Date().toTimeString().slice(0, 5)
   })
 
   useEffect(() => {
@@ -63,6 +110,7 @@ const EditExpenseModel = () => {
         amount: existingExpense.amount,
         category: existingExpense.category,
         type: existingExpense.type,
+        paymentMethod: existingExpense.paymentMethod, 
         date: dt,
         time: dt.toTimeString().slice(0, 5)
       })
@@ -76,7 +124,7 @@ const EditExpenseModel = () => {
   }
 
   const validateForm = () => {
-    const { title, amount, category, type, date, time } = form
+    const { title, amount, category, type, paymentMethod, date, time } = form
     if (!title || !amount || !type || !date || !time) {
       toast.error("Please fill all required fields.")
       return false
@@ -89,6 +137,10 @@ const EditExpenseModel = () => {
       toast.error("Title must be more than 2 characters.")
       return false
     }
+    if (!paymentMethod) {
+        toast.error("Please select a payment method.")
+        return false
+      }
     if (isNaN(amount) || Number(amount) <= 0) {
       toast.error("Amount must be a valid number.")
       return false
@@ -103,12 +155,17 @@ const EditExpenseModel = () => {
 
   const [loading, setLoading] = useState(false)
 
-  const debitCategories = [/* same as before */]
-  const creditCategories = [/* same as before */]
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!validateForm()) return
+    const parsed = expenseSchema.safeParse(form)
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors
+      setErrors(fieldErrors)
+      toast.error("Please fix errors.")
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -121,8 +178,7 @@ const EditExpenseModel = () => {
       const res = await axios.put(`/api/expenses/modify-expense/`, payload)
       if (res.status === 200) {
         toast.success("Expense updated!")
-        dispatch(updateExpense(res.data.expense))
-        dispatch(fetchExpensesSummary())
+        fetchDashboard(dispatch)
         handleClose()
       }
     } catch (err) {
@@ -135,91 +191,125 @@ const EditExpenseModel = () => {
 
   return (
     <Sheet open={editExpense.open} onOpenChange={handleClose}>
-      <SheetContent
+       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-3xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+        className="w-[95vw] max-w-3xl max-h-[95vh] sm:h-auto h-[95vh] mx-auto p-6 rounded-3xl backdrop-blur-lg bg-transparent border-2 md:mb-10 mb-4"
       >
-        <form onSubmit={handleSubmit}>
-          <SheetHeader className="px-0 py-2">
-            <SheetTitle className="text-sm text-neutral-500">Modify Expense</SheetTitle>
-            <SheetDescription />
+        <form onSubmit={handleSubmit} className="flex flex-col h-full" >
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Add New Expense</SheetTitle>
           </SheetHeader>
 
-          <div className="space-y-5 mt-4">
+          <div className=" space-y-5 mt-3 overflow-y-auto ">
             <div className="grid gap-2">
               <Label htmlFor="title" className="text-base">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                value={form.title}
-                onChange={handleChange}
-                className="text-base"
-                required
-              />
+              <Input id="title" name="title" className='text-base' value={form.title} onChange={handleChange} required />
+              {errors.title && <p className="text-sm text-red-500">{errors.title[0]}</p>}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="description" className="text-base">Description</Label>
-              <Textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                className="text-base"
-              />
+              <Textarea name="description" className='text-base' value={form.description} onChange={handleChange} />
+              {errors.description && <p className="text-sm text-red-500">{errors.description[0]}</p>}
+
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="amount" className="text-base">Amount</Label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-base text-muted-foreground">₹</span>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  value={form.amount}
-                  onChange={handleChange}
-                  className="pl-8 text-base"
+             <div className="flex sm:flex-row flex-col sm:items-start gap-5">
+               <div className="grid gap-2 w-full">
+                  <Label htmlFor="amount" className="text-base">Amount</Label>
+                  <div className="relative w-full">
+                    <span className="absolute inset-y-0 left-3 flex items-center text-base text-muted-foreground">₹</span>
+                    <Input
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      className="pl-8 text-base w-full"
+                      value={form.amount}
+                      onChange={handleChange}
+                      required
+                    />
+                    </div>
+              {errors.amount && <p className="text-sm text-red-500">{errors.amount[0]}</p>}
+
+                </div>
+                <div className="grid gap-2 w-full">
+                <Label className="text-base">Payment Method</Label>
+                <Select
+                  value={form.paymentMethod}
+                  onValueChange={(val) => setForm({ ...form, paymentMethod: val })}
+                  className="text-base w-full"
                   required
-                />
-              </div>
-            </div>
+                >
+                  <SelectTrigger className='w-full'>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent className='w-full'>
+                    <SelectItem value="upi">UPI</SelectItem>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="card">Card</SelectItem>
+                    <SelectItem value="netbanking">Net Banking</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              {errors.paymentMethod && <p className="text-sm text-red-500">{errors.paymentMethod[0]}</p>}
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="grid gap-2">
+              </div>
+             </div>
+           
+
+            {/* Responsive grid for type, category, date, time */}
+            <div className="flex sm:flex-row flex-col sm:items-start gap-5">
+              <div className="grid gap-2 w-full">
                 <Label className="text-base">Type</Label>
                 <Select
                   value={form.type}
                   onValueChange={(val) => setForm({ ...form, type: val, category: '' })}
+                  className="text-base w-full"
+                  required
                 >
-                  <SelectTrigger className="w-full text-base">
+                  <SelectTrigger className='w-full'>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
-                  <SelectContent className="w-full">
+                  <SelectContent className='w-full'>
                     <SelectItem value="credit">Credited</SelectItem>
                     <SelectItem value="debit">Debited</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              {errors.type && <p className="text-sm text-red-500">{errors.type[0]}</p>}
 
-              <div className="grid gap-2">
+              </div>
+              <div className="grid gap-2 w-full">
                 <Label className="text-base">Category</Label>
                 <Select
                   value={form.category}
                   onValueChange={(val) => setForm({ ...form, category: val })}
                   disabled={!form.type}
+                  className="text-base w-full"
+                  required
                 >
-                  <SelectTrigger className="w-full text-base">
+                  <SelectTrigger className='w-full'>
                     <SelectValue placeholder={form.type ? "Select category" : "Select type first"} />
                   </SelectTrigger>
-                  <SelectContent className="w-full">
+                  <SelectContent className='w-full'>
                     {(form.type === 'debit' ? debitCategories : form.type === 'credit' ? creditCategories : []).map(cat => (
                       <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              {errors.category && <p className="text-sm text-red-500">{errors.category[0]}</p>}
+
               </div>
+
+            </div>
+
+            <div className=" flex sm:flex-row flex-col sm:items-start gap-5">
               
-              <div className="grid gap-2">
+              <div className="grid gap-2 w-full">
                 <Label className="text-base">Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -234,16 +324,20 @@ const EditExpenseModel = () => {
                       selected={form.date}
                       onSelect={(date) => setForm({ ...form, date })}
                       initialFocus
+                      required
                     />
                   </PopoverContent>
                 </Popover>
+              {errors.date && <p className="text-sm text-red-500">{errors.date[0]}</p>}
+
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-2 w-full">
                 <Label className="text-base">Time</Label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
                   <Clock className="w-4 h-4 text-muted-foreground" />
                   <Input
+                    id="time"
                     name="time"
                     type="time"
                     value={form.time}
@@ -251,18 +345,20 @@ const EditExpenseModel = () => {
                     className="text-base w-full"
                     required
                   />
+              {errors.time && <p className="text-sm text-red-500">{errors.time[0]}</p>}
+
                 </div>
               </div>
             </div>
           </div>
 
           <SheetFooter className="mt-8 p-0">
-            <div className="flex flex-wrap gap-4 w-full">
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-green-950 text-green-500">
-                {loading ? 'Updating...' : 'Update Expense'}
+            <div className="flex flex-wrap items-center gap-4 w-full">
+              <Button type="submit" disabled={loading}  className="w-full sm:w-auto">
+                {loading ? 'Adding...' : 'Add Expense'}
               </Button>
               <SheetClose asChild>
-                <Button variant="outline" className="w-full sm:w-auto text-red-500">Cancel</Button>
+                <Button variant="outline" className="w-full sm:w-auto text-red-500">Close</Button>
               </SheetClose>
             </div>
           </SheetFooter>

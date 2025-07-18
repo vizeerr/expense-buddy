@@ -9,13 +9,18 @@ import User from '@/lib/models/User'       // your User model
 
 const LoginSchema = z.object({
   email: z.string().email('Invalid email'),
-  password: z.string().min(1, 'Password is required'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .regex(/[a-z]/, 'Password must include a lowercase letter')
+    .regex(/[A-Z]/, 'Password must include an uppercase letter')
+    .regex(/\d/, 'Password must include a number')
+    .regex(/[^a-zA-Z0-9]/, 'Password must include a special character'),
 })
 
 export async function POST(req) {
   try {
     await dbConnect()
-
     const body = await req.json()
     const result = LoginSchema.safeParse(body)
 
@@ -49,6 +54,7 @@ export async function POST(req) {
       email: user.email,
       name: user.name,
       role: user.role,
+      _id:user._id,
     }
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
@@ -61,6 +67,7 @@ export async function POST(req) {
       user: {
         name: user.name,
         email: user.email,
+        _id:user._id,
         role: user.role,
       },
     })

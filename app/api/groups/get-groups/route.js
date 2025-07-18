@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
-
 import dbConnect from '@/lib/mongodb'
 import Group from '@/lib/models/Group'
 import User from '@/lib/models/User'
@@ -19,37 +18,32 @@ export async function GET() {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
-      console.log(err);
-      
+      console.error('JWT Error:', err)
       return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
     }
 
     await dbConnect()
-    const userEmail = decoded.email
 
-    // Get user _id to match against createdBy
-    const user = await User.findOne({ email: userEmail }).select('_id')
+    const user = await User.findOne({ email: decoded.email }).select('_id email')
     if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 401 })
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 })
     }
 
-    const userId = user._id.toString()
-
-    // Fetch all groups with member info
-    const allGroups = await Group.find({})
-      .populate('members.user', 'email')
+    // ✅ Fetch only groups where user is owner or a member
+    const groups = await Group.find({
+      $or: [
+        { owner: user._id },
+        { 'members.user': user._id }
+      ]
+    })
+      .populate('owner', 'name email') // optional: populate owner info
+      .populate('members.user', 'name email') // populate members info
       .sort({ createdAt: -1 })
-
-    const userGroups = allGroups.filter(group =>
-      group.createdBy.toString() === userId ||               // ✅ Created by user
-      group.members?.some(m => m.user?.email === userEmail)  // ✅ Member of group
-    )
 
     return NextResponse.json({
       success: true,
-      groups: userGroups,
+      groups,
     })
-
   } catch (err) {
     console.error('Fetch Groups Error:', err)
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })

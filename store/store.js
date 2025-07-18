@@ -16,7 +16,8 @@ import groupBalanceReducer from './slices/group/groupBalanceSlice';
 import groupExpensesReducer from './slices/group/groupExpensesSlice';
 import groupExpensesSummaryReducer from './slices/group/groupExpenseSummarySlice';
 import groupBudgetReducer from './slices/group/groupBudgetSummarySlice';
-import groupAnalyticsReducer from './slices/group/analyticsSlice';
+import groupAnalyticsReducer from './slices/group/groupAnalyticsSlice';
+import memberSummarySlice from './slices/group/memberSummarySlice'
 
 export const store = configureStore({
   reducer: {
@@ -38,5 +39,6 @@ export const store = configureStore({
     groupExpensesSummary: groupExpensesSummaryReducer,
     groupBudget: groupBudgetReducer,
     groupAnalytics: groupAnalyticsReducer,
+    groupMember:memberSummarySlice
   },
 });

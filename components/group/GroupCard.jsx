@@ -5,8 +5,8 @@ import {
   Calendar,
   Eye,
   ShieldCheck,
-  UserRound,
 } from 'lucide-react'
+
 import {
   Card,
   CardHeader,
@@ -16,17 +16,26 @@ import {
   CardFooter,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { format } from 'date-fns'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { format } from 'date-fns'
+import { useSelector } from 'react-redux'
 
-
-const GroupCard = ({ group, currentUserId, onView }) => {
-  const isAdmin = group.createdBy?._id === currentUserId
-  const members = group.members || []
+const GroupCard = ({ group }) => {
   const router = useRouter()
+  const currentUser = useSelector((state) => state.auth.user)
+  console.log(group);
+  
 
+  const members = group.members || []
+
+  const isOwner = group.owner?._id === currentUser?._id
+  const isAdmin = members.some(
+    (m) => m.user?._id === currentUser?._id && m.role === 'admin'
+  )
+
+  const roleBadge = isOwner ? 'Owner' : isAdmin ? 'Admin' : null
 
   const initials = (name = '') => {
     return name
@@ -37,10 +46,10 @@ const GroupCard = ({ group, currentUserId, onView }) => {
   }
 
   return (
-    <Card className={cn(
-      "relative border rounded-2xl overflow-hidden backdrop-blur-xl bg-[#000000] shadow-xl transition hover:scale-[1.03]"
+    <Card onClick={() => router.push(`/dashboard/groups/${group._id}`)} className={cn(
+      "relative border rounded-2xl overflow-hidden bg-[#000000] md:hover:border-white shadow-xl transition duration-100 md:hover:scale-[1.05]"
     )}>
-      <CardHeader className="">
+      <CardHeader>
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-lg text-white">{group.name}</CardTitle>
@@ -48,16 +57,21 @@ const GroupCard = ({ group, currentUserId, onView }) => {
               {group.description || 'No description'}
             </CardDescription>
           </div>
-          {isAdmin && (
-            <div className="flex items-center gap-1 px-2 py-1 text-xs bg-green-900/30 text-green-300 rounded-full">
+          {roleBadge && (
+            <div className={cn(
+              "flex items-center gap-1 px-2 py-1 text-xs rounded-full",
+              roleBadge === 'Owner'
+                ? 'bg-yellow-800/30 text-yellow-300'
+                : 'bg-green-900/30 text-green-300'
+            )}>
               <ShieldCheck className="w-3 h-3" />
-              Admin
+              {roleBadge}
             </div>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="text-sm text-muted-foreground space-y-3 ">
+      <CardContent className="text-sm text-muted-foreground space-y-3">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-zinc-400" />
           <span>Created: {format(new Date(group.createdAt), 'dd MMM yyyy')}</span>
@@ -68,7 +82,6 @@ const GroupCard = ({ group, currentUserId, onView }) => {
           <span>{members.length} member{members.length !== 1 ? 's' : ''}</span>
         </div>
 
-        {/* Member Avatars */}
         <div className="flex items-center gap-2 pt-2">
           {members.slice(0, 3).map((m, idx) => (
             <Avatar
@@ -85,18 +98,6 @@ const GroupCard = ({ group, currentUserId, onView }) => {
           )}
         </div>
       </CardContent>
-
-      <CardFooter className="flex justify-end">
-        <Button
-          size="sm"
-          variant="secondary"
-          className="text-white"
-          onClick={() => router.push(`/dashboard/groups/${group._id}`)}
-        >
-          <Eye className="w-4 h-4 mr-2" />
-          View Group
-        </Button>
-      </CardFooter>
     </Card>
   )
 }

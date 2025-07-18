@@ -3,42 +3,53 @@ import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
+import User from '@/lib/models/User'
 
 export async function GET(req) {
   try {
-    const cookieStore = cookies()
-    const token = (await cookieStore).get('authToken')?.value
+    const cookieStore = await cookies()
+    const token = cookieStore.get('authToken')?.value
 
     if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
     }
 
     let decoded
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
-      console.log(err);
-      return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 })
+      console.error('Token Verification Error:', err)
+      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
     }
 
     await dbConnect()
 
+    // ✅ Step: Check if user still exists
+    const user = await User.findOne({ email: decoded.email })
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(req.url)
 
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    // ✅ Fallbacks with bounds
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '10')))
+
     const type = searchParams.get('type') || ''
     const category = searchParams.get('category') || ''
+    const paymentMethod = searchParams.get('paymentMethod') || ''
     const search = searchParams.get('search') || ''
     const trashed = searchParams.get('trashed') === 'true'
 
     const query = {
       userEmail: decoded.email,
-      trashed, // ✅ Filter by trash state
+      trashed,
     }
 
     if (type) query.type = type
     if (category) query.category = category
+    if (paymentMethod) query.paymentMethod = paymentMethod
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -47,13 +58,13 @@ export async function GET(req) {
       ]
     }
 
-    const expenses = await Expense.find(query)
-      .sort({ datetime: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-
-    const total = await Expense.countDocuments(query)
-    const hasMore = page * limit < total
+    const [expenses, total] = await Promise.all([
+      Expense.find(query)
+        .sort({ datetime: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Expense.countDocuments(query),
+    ])
 
     return NextResponse.json({
       success: true,
@@ -61,12 +72,12 @@ export async function GET(req) {
       pagination: {
         page,
         total,
-        hasMore,
+        hasMore: page * limit < total,
       }
     })
 
   } catch (err) {
     console.error('Get Expenses Error:', err)
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 })
+    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
   }
 }

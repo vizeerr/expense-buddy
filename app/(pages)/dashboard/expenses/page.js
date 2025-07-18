@@ -36,6 +36,7 @@ const ExpensesPage = () => {
 
   return (
     <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-16 space-y-6 ">
+      
        <ExpensesCard/>
       
       <div className='bg-neutral-900 p-6 rounded-2xl border'>
@@ -61,7 +62,7 @@ const ExpensesPage = () => {
         ))}
 
         {loading && (
-          Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[60px] w-full rounded-xl" />)
+          Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-[120px] w-full rounded-xl" />)
         )}
       </div>
 

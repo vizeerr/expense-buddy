@@ -23,28 +23,32 @@ const AddGroupModal = () => {
   const isOpen = useSelector(state => state.ui.isAddGroupOpen)
   const dispatch = useDispatch()
 
-  const [form, setForm] = useState({
-    name: '',
-    description: ''
-  })
+  const [form, setForm] = useState({ name: '', description: '' })
   const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name || form.name.length < 2) {
+    const trimmedName = form.name.trim()
+
+    if (!trimmedName || trimmedName.length < 2) {
       return toast.error("Group name must be at least 2 characters")
     }
 
     setLoading(true)
     try {
-      await dispatch(createGroup(form)).unwrap()
+      await dispatch(createGroup({
+        name: trimmedName,
+        description: form.description?.trim() || ''
+      })).unwrap()
+
       toast.success("Group created!")
-      dispatch(closeAddGroup())
       setForm({ name: '', description: '' })
+      dispatch(closeAddGroup())
     } catch (err) {
       toast.error(err || "Failed to create group")
     } finally {
@@ -53,7 +57,7 @@ const AddGroupModal = () => {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={() => dispatch(closeAddGroup())}>
+    <Sheet open={isOpen} onOpenChange={() => !loading && dispatch(closeAddGroup())}>
       <SheetContent
         side="bottom"
         className="w-[95vw] max-w-2xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
@@ -95,7 +99,9 @@ const AddGroupModal = () => {
                 {loading ? 'Creating...' : 'Create Group'}
               </Button>
               <SheetClose asChild>
-                <Button variant="outline" className="w-full sm:w-auto text-red-500">Close</Button>
+                <Button variant="outline" className="w-full sm:w-auto text-red-500" disabled={loading}>
+                  Close
+                </Button>
               </SheetClose>
             </div>
           </SheetFooter>

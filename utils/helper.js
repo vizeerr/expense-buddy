@@ -48,3 +48,7 @@ export const creditCategories = [
   { value: 'bonus', label: 'Bonus' },
   { value: 'others', label: 'Others' },
 ]
+
+export const sendMail = () =>{
+  
+}

@@ -28,7 +28,13 @@ const balanceSlice = createSlice({
     error: null,
     summary: null,
   },
-  reducers: {},
+  reducers: {
+    resetBalanceSummary: (state) => {
+      state.summary = null
+      state.loading = false
+      state.error = null
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBalanceSummary.pending, (state) => {

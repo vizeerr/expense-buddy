@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDispatch, useSelector } from 'react-redux'
-import { openAddExpense, openAddBudget } from "@/store/slices/uiSlice"
+import { openAddGroupExpense, openGroupAddBudget } from "@/store/slices/uiSlice"
 import { fetchGroupBalanceSummary } from "@/store/slices/group/groupBalanceSlice"
 import { fetchGroupExpenseSummary } from "@/store/slices/group/groupExpenseSummarySlice"
 import { fetchGroupBudgetSummary } from "@/store/slices/group/groupBudgetSummarySlice"
-import { fetchGroupAnalytics } from "@/store/slices/group/analyticsSlice"
+import { fetchGroupAnalytics } from "@/store/slices/group/groupAnalyticsSlice"
 import StatItem from "./StateItem"
 
 const currencyFormat = (val) => `₹ ${val?.toLocaleString?.() || '0'}`
@@ -47,16 +47,34 @@ const ChartCard = ({ title, subtitle, children }) => (
 const GroupBalanceCard = ({id}) => {
   const dispatch = useDispatch()
   const { summary, loading: balanceLoading } = useSelector(state => state.groupBalance)
+  
+  
   const { data: expenseData, loading: expenseLoading } = useSelector(state => state.groupExpensesSummary)
   const { data: budgetData, loading: budgetLoading } = useSelector(state => state.groupBudget)
   const { data: analytics, loading: analyticsLoading } = useSelector(state => state.groupAnalytics)
+  
+  useEffect(() => {
+  if (!id) return
+    dispatch(fetchGroupBalanceSummary(id))
+    dispatch(fetchGroupExpenseSummary(id))
+    dispatch(fetchGroupBudgetSummary(id))
+    dispatch(fetchGroupAnalytics(id))
+  }, [dispatch, id])
+
+  // useEffect(() => {
+  //   dispatch(fetchGroupBalanceSummary(id))
+  //   console.log(summary);
+    
+  //   // dispatch(fetchGroupAnalytics())
+  // }, [dispatch,id])
 
   useEffect(() => {
-    dispatch(fetchGroupBalanceSummary(id))
-    // dispatch(fetchGroupExpenseSummary())
-    // dispatch(fetchGroupBudgetSummary())
-    // dispatch(fetchGroupAnalytics())
-  }, [dispatch])
+  if (summary) {
+    console.log('Group Summary:', summary)
+    console.log(expenseData);
+    
+  }
+}, [summary])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-6 gap-8">
@@ -97,7 +115,7 @@ const GroupBalanceCard = ({id}) => {
             <Wallet />
             <p className="text-xl font-bold">Group Expenses</p>
           </div>
-          <Button size="sm" onClick={() => dispatch(openAddExpense())}>
+          <Button size="sm" onClick={() => dispatch(openAddGroupExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
           </Button>
         </CardHeader>
@@ -134,7 +152,7 @@ const GroupBalanceCard = ({id}) => {
             <BadgeDollarSign />
             <p className="text-xl font-bold">Group Budget</p>
           </div>
-          <Button size="sm" onClick={() => dispatch(openAddBudget())}>
+          <Button size="sm" onClick={() => dispatch(openGroupAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
           </Button>
         </CardHeader>

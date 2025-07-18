@@ -1,6 +1,6 @@
 // app/dashboard/groups/join/page.tsx
 import { Suspense } from 'react'
-import GroupJoinPage from './GroupJoinPage'
+import GroupJoinPage from '@/components/group/GroupJoinPage'
 
 export default function Page() {
   return (

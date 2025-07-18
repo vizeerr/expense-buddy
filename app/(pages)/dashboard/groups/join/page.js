@@ -33,6 +33,8 @@ export default function GroupJoinPage() {
           toast.error(res.data.message || 'Invalid or expired link')
         }
       } catch (err) {
+        console.log(err);
+        
         toast.error('Something went wrong')
       } finally {
         setLoading(false)

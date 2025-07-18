@@ -107,7 +107,7 @@ const EditExpenseModel = () => {
       setForm({
         title: existingExpense.title,
         description: existingExpense.description,
-        amount: existingExpense.amount,
+        amount: existingExpense.amount.toString(),
         category: existingExpense.category,
         type: existingExpense.type,
         paymentMethod: existingExpense.paymentMethod, 
@@ -178,7 +178,7 @@ const EditExpenseModel = () => {
       const res = await axios.put(`/api/expenses/modify-expense/`, payload)
       if (res.status === 200) {
         toast.success("Expense updated!")
-        fetchDashboard(dispatch)
+        fetchDashboard(dispatch,{force:true})
         handleClose()
       }
     } catch (err) {
@@ -354,8 +354,8 @@ const EditExpenseModel = () => {
 
           <SheetFooter className="mt-8 p-0">
             <div className="flex flex-wrap items-center gap-4 w-full">
-              <Button type="submit" disabled={loading}  className="w-full sm:w-auto">
-                {loading ? 'Adding...' : 'Add Expense'}
+              <Button type="submit" disabled={loading}  className="w-full hover:bg-green-950 bg-green-900 text-green-300 sm:w-auto">
+                {loading ? 'Updating...' : 'Update Expense'}
               </Button>
               <SheetClose asChild>
                 <Button variant="outline" className="w-full sm:w-auto text-red-500">Close</Button>

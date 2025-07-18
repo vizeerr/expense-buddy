@@ -205,7 +205,7 @@ const ExpenseItem = ({ expense }) => {
       {
         expense.trashed ?  (
           // <Undo2 onClick={restoreExpense} className="ms-2 w-5 h-5 text-neutral-300 hover:text-white cursor-pointer"/>
-          <DropdownMenu>
+          <DropdownMenu onClick={(e) => e.stopPropagation()}>
         <DropdownMenuTrigger className="outline-none ml-4">
           <MoreHorizontal className="w-5 h-5 text-muted-foreground hover:text-white cursor-pointer" />
         </DropdownMenuTrigger>
@@ -214,20 +214,20 @@ const ExpenseItem = ({ expense }) => {
           align="end"
           className="w-40 bg-neutral-900 border border-neutral-800"
         >
-          <DropdownMenuItem onClick={() => dispatch(openViewExpense(expense._id))} className="cursor-pointer">
+          <DropdownMenuItem onClick={(e) => {e.stopPropagation(); dispatch(openViewExpense(expense._id))}} className="cursor-pointer">
             <Eye className="w-4 h-4 mr-2" /> View
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={restoreExpense} className="cursor-pointer">
+          <DropdownMenuItem onClick={(e)=>{e.stopPropagation(); restoreExpense()}} className="cursor-pointer">
             <Undo2 className="w-4 h-4 mr-2" /> Restore
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handlePermanentDelete} className="cursor-pointer text-red-500">
+          <DropdownMenuItem onClick={(e)=>{e.stopPropagation(); handlePermanentDelete()}} className="cursor-pointer text-red-500">
             <Trash2 className="w-4 h-4 mr-2" /> Delete Forever
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
         ) :
         (
-          <DropdownMenu>
+          <DropdownMenu onClick={(e) => e.stopPropagation()}>
         <DropdownMenuTrigger className="outline-none ml-4">
           <MoreHorizontal className="w-5 h-5 text-muted-foreground hover:text-white cursor-pointer" />
         </DropdownMenuTrigger>
@@ -236,10 +236,10 @@ const ExpenseItem = ({ expense }) => {
           align="end"
           className="w-40 bg-neutral-900 border border-neutral-800"
         >
-          <DropdownMenuItem onClick={() => dispatch(openViewExpense(expense._id))} className="cursor-pointer">
+          <DropdownMenuItem onClick={(e) => {e.stopPropagation(); dispatch(openViewExpense(expense._id))}} className="cursor-pointer">
             <Eye className="w-4 h-4 mr-2" /> View
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => dispatch(openEditExpense(expense._id))} className="cursor-pointer">
+          <DropdownMenuItem onClick={(e) => {e.stopPropagation(); dispatch(openEditExpense(expense._id))}} className="cursor-pointer">
             <Pencil className="w-4 h-4 mr-2" /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-500">

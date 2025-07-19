@@ -17,7 +17,7 @@ export default function Greeting() {
 
   return (
     <div className="px-2">
-      <h2 className="xl:text-xl text-lg text-neutral-400">
+      <h2 className="xl:text-xl text-lg text-neutral-400 drop-shadow-2xl drop-shadow-amber-700 ">
         {getGreeting()}, <br/> <span className="xl:text-2xl text-2xl mt font-medium text-neutral-300 italic capitalize">{name}</span>
       </h2>
     </div>

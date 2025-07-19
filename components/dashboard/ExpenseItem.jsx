@@ -173,9 +173,9 @@ const ExpenseItem = ({ expense }) => {
             <div
               className={`${
                 expense.type === 'debit'
-                  ? 'text-red-500 bg-red-950 drop-shadow-red-800'
-                  : 'text-green-500 bg-green-950 drop-shadow-green-800'
-              } p-2.5 md:w-12 md:h-12 w-11 h-11 drop-shadow-2xl  rounded-md border flex items-center justify-center`}
+                  ? 'text-red-600 bg-transparent border-red-700 drop-shadow-red-700'
+                  : 'text-green-500 bg-transparent border-green-700 drop-shadow-green-700'
+              } p-2.5 md:w-12 md:h-12 w-11 h-11 drop-shadow-xl  rounded-md border flex items-center justify-center`}
             >
               <Icon className="w-full" />
             </div>
@@ -198,7 +198,7 @@ const ExpenseItem = ({ expense }) => {
             <p className="text-xs text-neutral-400">{formattedDate}</p>
           </div>
 <div className='space-y-3'>
-  <div className="py-1 px-2 text-center rounded-full bg-[#ffbf0054] text-[0.6rem] capitalize font-semibold">
+  <div className="py-1 px-3 text-center rounded-full border border-amber-600 text-amber-600 drop-shadow-xl drop-shadow-amber-700 bg-transparent text-[0.65rem] capitalize font-semibold">
             {expense.paymentMethod || "Other"}
           </div>
                {/* Dropdown */}
@@ -264,8 +264,8 @@ const ExpenseItem = ({ expense }) => {
         </div>
         <div className='flex'>
           <p
-          className={`text-base font-semibold flex gap-1 items-center flex-shrink-0 ${
-            expense.type === 'debit' ? 'text-red-500' : 'text-green-500'
+          className={`text-base font-semibold flex gap-1 items-center drop-shadow-lg flex-shrink-0 ${
+            expense.type === 'debit' ? 'text-red-500 drop-shadow-red-900' : 'text-green-500 drop-shadow-green-900'
           }`}
         >
           {expense.type === 'debit' ? '-' : '+'}₹ {expense.amount}

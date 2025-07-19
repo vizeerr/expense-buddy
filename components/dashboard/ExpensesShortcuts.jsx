@@ -21,7 +21,7 @@ const ExpensesShortcuts = () => {
 
   return (
     <>
-      <div className="border p-6 xl:rounded-2xl rounded-2xl bg-transparent ">
+      <div className="border px-4 py-6  xl:rounded-2xl rounded-2xl bg-transparent ">
         <div className="flex gap-2 items-center">
           <ShoppingBag className="w-6" />
           <p className="text-xl font-bold">Recent Transactions</p>
@@ -40,9 +40,9 @@ const ExpensesShortcuts = () => {
             <p className="text-xs font-bold text-neutral-500">Today</p>
           </div>
 
-          <hr className="my-4" />
+          {/* <hr className="my-4" /> */}
 
-          <div className="space-y-4">
+          <div className="space-y-4 mt-4">
             {loading ? (
               Array(3)
                 .fill(0)

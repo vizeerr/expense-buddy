@@ -73,13 +73,13 @@ const BalanceCard = () => {
   }, [dispatch])
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-6 gap-8 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-4 gap-8 items-start">
       
       {/* --- Accounts Card --- */}
       <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950">
         <CardHeader
           onClick={toggleAccountCollapse}
-          className="flex items-center justify-between cursor-pointer "
+          className="flex items-center justify-between cursor-pointer px-4 py-1"
         >
           <div className="flex items-center gap-2">
             <Wallet />
@@ -88,7 +88,7 @@ const BalanceCard = () => {
           {accountCollapse ? <ChevronRight /> : <ChevronDown />}
          
       </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-5 px-4">
            <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
@@ -136,13 +136,13 @@ const BalanceCard = () => {
         
         <CardHeader
           
-          className="flex items-center justify-between cursor-pointer"
+          className="flex items-center justify-between cursor-pointer px-4"
         >
           <div className="flex gap-2 items-center" onClick={toggleExpenseCollapse}>
             <Wallet />
             <p className="text-xl font-bold">Expenses</p>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center">
           <Button size=""  className="rounded-sm bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600" onClick={() => dispatch(openAddExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
           </Button>
@@ -151,7 +151,7 @@ const BalanceCard = () => {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-5 px-4">
            <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
@@ -196,21 +196,21 @@ const BalanceCard = () => {
       <Card className="drop-shadow-2xl bg-transparent drop-shadow-amber-950">
         <CardHeader
           
-          className="flex items-center justify-between cursor-pointer"
+          className="flex items-center justify-between cursor-pointer px-4"
         >
           <div className="flex gap-2 items-center" onClick={toggleBudgetCollapse}>
             <BadgeDollarSign />
             <p className="text-xl font-bold">Budget</p>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center">
            <Button size=""  className="rounded-sm bg-transparent border border-amber-500 text-amber-500 drop-shadow-xl drop-shadow-amber-600" onClick={() => dispatch(openAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
           </Button>
           {budgetCollapse ? <ChevronRight onClick={toggleBudgetCollapse}/> : <ChevronDown onClick={toggleBudgetCollapse}/>}
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-5 px-4">
            <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
@@ -252,7 +252,7 @@ const BalanceCard = () => {
       {/* --- Analytics Charts --- */}
 
       <Card className="col-span-1 lg:col-span-1 2xl:col-span-3  bg-transparent   ">
-        <CardHeader className=" flex items-center justify-between w-full 2xl:hidden" onClick={toggleAnalyticCollapse}>
+        <CardHeader className=" flex items-center justify-between w-full 2xl:hidden px-4" onClick={toggleAnalyticCollapse}>
           <div className="flex gap-2 items-center">
             <AreaChartIcon />
             <p className="text-xl font-bold">Analytics</p>
@@ -261,7 +261,7 @@ const BalanceCard = () => {
             {analyticCollapse ?  <ChevronDown />: <ChevronRight /> }
           </div>
         </CardHeader>
-        <CardHeader className=" 2xl:flex items-center justify-between w-full hidden" >
+        <CardHeader className=" 2xl:flex items-center justify-between w-full hidden px-4" >
           <div className="flex gap-2 items-center">
             <AreaChartIcon />
             <p className="text-xl font-bold">Analytics</p>
@@ -282,7 +282,7 @@ const BalanceCard = () => {
       className="overflow-hidden"
     >
           
-        <CardContent className="">
+        <CardContent className="px-4">
           <Carousel className="sm:w-[90%] lg:w-[85%] 2xl:w-full w-[80%] mx-auto">
             <CarouselContent>
 
@@ -296,7 +296,7 @@ const BalanceCard = () => {
                   </ReLineChart>
                 </ChartCard>
               </CarouselItem>
-              <CarouselItem className=" md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <CarouselItem className=" md:basis-1/2 lg:basis-full 2xl:basis-1/4">
               <ChartCard title="Expense Pattern" subtitle="Weekly Breakdown">
                 <ReBarChart data={analytics?.expensePattern || []}>
                   <XAxis dataKey="name" hide />
@@ -310,7 +310,7 @@ const BalanceCard = () => {
                 </ReBarChart>
               </ChartCard>
               </CarouselItem>
-              <CarouselItem className="  md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <CarouselItem className="  md:basis-1/2 lg:basis-full 2xl:basis-1/4">
               <ChartCard title="Budget Utilization" subtitle="Current Cycle">
                 <ReAreaChart data={analytics?.budgetUtilization || []}>
                   <XAxis dataKey="name" hide />
@@ -320,7 +320,7 @@ const BalanceCard = () => {
                 </ReAreaChart>
               </ChartCard>
               </CarouselItem>
-              <CarouselItem className=" md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <CarouselItem className=" md:basis-1/2 lg:basis-full 2xl:basis-1/4">
               <ChartCard title="Category Wise Expenditure" subtitle="Spending Habits">
                 <ResponsiveContainer width="100%" height={180}>
                   <ReBarChart data={analytics?.categoryWise || []} layout="vertical" margin={{ top: 10, right: 10, left: 20, bottom: 10 }}>
@@ -354,7 +354,7 @@ const BalanceCard = () => {
       transition={{ duration: 0.5, ease: 'easeInOut' }}
       className="overflow-hidden"
     >
-        <CardContent className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 2xl:gap-6 gap-4">
+        <CardContent className="px-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 2xl:gap-6 gap-4">
           <ChartCard title="Account Balance Trend" subtitle="Past 4 Weeks">
             <ReLineChart data={analytics?.balanceTrend || []}>
               <XAxis dataKey="name" hide />

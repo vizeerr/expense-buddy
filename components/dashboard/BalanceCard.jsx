@@ -76,7 +76,7 @@ const BalanceCard = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-4 gap-8 items-start">
       
       {/* --- Accounts Card --- */}
-      <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950">
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950 py-4">
         <CardHeader
           onClick={toggleAccountCollapse}
           className="flex items-center justify-between cursor-pointer px-4 py-1"
@@ -132,18 +132,18 @@ const BalanceCard = () => {
       </Card>
 
       {/* --- Expenses Card --- */}
-      <Card className="drop-shadow-2xl bg-transparent drop-shadow-red-950">
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-red-950 py-4">
         
         <CardHeader
           
-          className="flex items-center justify-between cursor-pointer px-4"
+          className="flex items-center justify-between cursor-pointer px-4 "
         >
           <div className="flex gap-2 items-center" onClick={toggleExpenseCollapse}>
             <Wallet />
             <p className="text-xl font-bold">Expenses</p>
           </div>
           <div className="flex gap-2 items-center">
-          <Button size=""  className="rounded-sm bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600" onClick={() => dispatch(openAddExpense())}>
+          <Button size="sm"  className="rounded-sm bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600" onClick={() => dispatch(openAddExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
           </Button>
 
@@ -193,7 +193,7 @@ const BalanceCard = () => {
       </Card>
 
       {/* --- Budget Card --- */}
-      <Card className="drop-shadow-2xl bg-transparent drop-shadow-amber-950">
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-amber-950 py-4">
         <CardHeader
           
           className="flex items-center justify-between cursor-pointer px-4"
@@ -251,7 +251,7 @@ const BalanceCard = () => {
 
       {/* --- Analytics Charts --- */}
 
-      <Card className="col-span-1 lg:col-span-1 2xl:col-span-3  bg-transparent   ">
+      <Card className="col-span-1 lg:col-span-1 2xl:col-span-3  bg-transparent   py-4">
         <CardHeader className=" flex items-center justify-between w-full 2xl:hidden px-4" onClick={toggleAnalyticCollapse}>
           <div className="flex gap-2 items-center">
             <AreaChartIcon />

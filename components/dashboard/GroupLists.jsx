@@ -51,7 +51,7 @@ const GroupLists = () => {
   }
 
   return (
-    <div className="border p-6 xl:rounded-2xl rounded-2xl bg-neutral-900 w-full">
+    <div className="border p-6 xl:rounded-2xl rounded-2xl bg-transparent drop-shadow-2xl drop-shadow-orange-900 w-full">
         <div className="flex gap-2 items-center">
           <Users className="w-5" />
           <p className="text-xl font-bold">All Groups</p>
@@ -64,7 +64,7 @@ const GroupLists = () => {
               key={index}
               className=" md:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
             >
-              <Card className="hover:border-primary hover:shadow-md transition-all duration-200 h-full">
+              <Card className="hover:border-primary hover:shadow-md transition-all duration-200 h-full bg-transparent">
                 <CardHeader className="flex flex-row items-center gap-3">
                   <div className='bg-amber-950 h-10 w-10 rounded-full border p-2.5'>
                     <Users className="h-full w-full" />

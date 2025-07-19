@@ -42,7 +42,7 @@ const COLORS = [
 ]
 
 const ChartCard = ({ title, subtitle, children }) => (
-  <Card className="bg-muted">
+  <Card className="bg-transparent">
     <CardHeader>
       <p className="text-sm font-medium text-muted-foreground">{title}</p>
       <p className="text-xs text-muted-foreground">{subtitle}</p>
@@ -73,10 +73,10 @@ const BalanceCard = () => {
   }, [dispatch])
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-6 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-6 gap-8 items-start">
       
       {/* --- Accounts Card --- */}
-      <Card>
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950">
         <CardHeader
           onClick={toggleAccountCollapse}
           className="flex items-center justify-between cursor-pointer "
@@ -132,22 +132,22 @@ const BalanceCard = () => {
       </Card>
 
       {/* --- Expenses Card --- */}
-      <Card>
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-red-950">
         
         <CardHeader
-          onClick={toggleExpenseCollapse}
+          
           className="flex items-center justify-between cursor-pointer"
         >
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center" onClick={toggleExpenseCollapse}>
             <Wallet />
             <p className="text-xl font-bold">Expenses</p>
           </div>
           <div className="flex gap-4 items-center">
-          <Button size="sm" onClick={() => dispatch(openAddExpense())}>
+          <Button size=""  className="rounded-sm bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600" onClick={() => dispatch(openAddExpense())}>
             <Plus className="mr-1 h-4 w-4" /> Add Expense
           </Button>
 
-          {expenseCollapse ? <ChevronRight /> : <ChevronDown />}
+          {expenseCollapse ? <ChevronRight onClick={toggleExpenseCollapse}/> : <ChevronDown onClick={toggleExpenseCollapse}/>}
           </div>
         </CardHeader>
 
@@ -193,21 +193,21 @@ const BalanceCard = () => {
       </Card>
 
       {/* --- Budget Card --- */}
-      <Card>
+      <Card className="drop-shadow-2xl bg-transparent drop-shadow-amber-950">
         <CardHeader
-          onClick={toggleBudgetCollapse}
+          
           className="flex items-center justify-between cursor-pointer"
         >
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center" onClick={toggleBudgetCollapse}>
             <BadgeDollarSign />
             <p className="text-xl font-bold">Budget</p>
           </div>
 
           <div className="flex gap-4 items-center">
-           <Button size="sm" onClick={() => dispatch(openAddBudget())}>
+           <Button size=""  className="rounded-sm bg-transparent border border-amber-500 text-amber-500 drop-shadow-xl drop-shadow-amber-600" onClick={() => dispatch(openAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
           </Button>
-          {budgetCollapse ? <ChevronRight /> : <ChevronDown />}
+          {budgetCollapse ? <ChevronRight onClick={toggleBudgetCollapse}/> : <ChevronDown onClick={toggleBudgetCollapse}/>}
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -250,14 +250,15 @@ const BalanceCard = () => {
       </Card>
 
       {/* --- Analytics Charts --- */}
-      <Card className="col-span-1 lg:col-span-1 2xl:col-span-3">
+
+      <Card className="col-span-1 lg:col-span-1 2xl:col-span-3  bg-transparent   ">
         <CardHeader className=" flex items-center justify-between w-full 2xl:hidden" onClick={toggleAnalyticCollapse}>
           <div className="flex gap-2 items-center">
             <AreaChartIcon />
             <p className="text-xl font-bold">Analytics</p>
           </div>
           <div className="2xl:hidden">
-            {analyticCollapse ? <ChevronRight /> : <ChevronDown />}
+            {analyticCollapse ?  <ChevronDown />: <ChevronRight /> }
           </div>
         </CardHeader>
         <CardHeader className=" 2xl:flex items-center justify-between w-full hidden" >

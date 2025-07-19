@@ -162,22 +162,22 @@ const ExpenseItem = ({ expense }) => {
   }
 
   return (
-    <div onClick={() => dispatch(openViewExpense(expense._id))} className={`${expense.trashed? "bg-neutral-800":"bg-black"}  md:hover:scale-[1.02]  border border-transparent md:hover:border-white transition cursor-pointer flex items-center justify-between md:py-4 md:px-4 py-3 px-4 md:rounded-2xl rounded-xl`}>
+    <div onClick={() => dispatch(openViewExpense(expense._id))} className={`${expense.trashed? "bg-neutral-800":"bg-transparent"}  border md:hover:scale-[1.02]   md:hover:border-white transition cursor-pointer flex items-center justify-between md:py-4 md:px-4 py-3 px-4 md:rounded-2xl rounded-xl`}>
       {/* Icon */}
       <div className='flex-col flex gap-3 w-full'>
 
         <div className='flex'>
 
     
-          <div className="flex md:gap-4 gap-2 items-center">
+          <div className="flex md:gap-4 gap-2 items-center ">
             <div
               className={`${
                 expense.type === 'debit'
-                  ? 'text-red-500 bg-red-950'
-                  : 'text-green-500 bg-green-950'
-              } p-2 md:w-10 md:h-12 w-11 h-11 rounded-md border flex items-center justify-center`}
+                  ? 'text-red-500 bg-red-950 drop-shadow-red-800'
+                  : 'text-green-500 bg-green-950 drop-shadow-green-800'
+              } p-2.5 md:w-12 md:h-12 w-11 h-11 drop-shadow-2xl  rounded-md border flex items-center justify-center`}
             >
-              <Icon className="w-8 h-8" />
+              <Icon className="w-full" />
             </div>
           </div>
 

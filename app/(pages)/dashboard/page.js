@@ -3,6 +3,7 @@ import React from 'react'
 import ExpensesShortcuts from '@/components/dashboard/ExpensesShortcuts'
 import BalanceCard from '../../../components/dashboard/BalanceCard'
 import Greeting from '../../../components/dashboard/Greetings'
+import GroupLists from '../../../components/dashboard/GroupLists'
 
 const page = () => {
   return (
@@ -10,9 +11,9 @@ const page = () => {
       <Greeting/>
       <BalanceCard/>
       {/* <Highlights/> */}
+      <GroupLists/>
       <ExpensesShortcuts/>
       
-      {/* <DeleteExpenseModel/> */}
     </div>
   )
 }

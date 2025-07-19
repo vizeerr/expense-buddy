@@ -24,6 +24,15 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 
 import { motion, AnimatePresence } from 'framer-motion'
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+
+
 // Utility to format currency
 const currencyFormat = (val) => `₹ ${val?.toLocaleString?.() || '0'}`
 
@@ -55,6 +64,8 @@ const BalanceCard = () => {
   const [accountCollapse, toggleAccountCollapse] = useLocalCollapse('accounts-card') || "false"
   const [expenseCollapse, toggleExpenseCollapse] = useLocalCollapse('expense-card') || "false"
   const [budgetCollapse, toggleBudgetCollapse] = useLocalCollapse('budget-card') || "false"
+  const [analyticCollapse, toggleAnalyticCollapse] = useLocalCollapse('analytic-card') || "false"
+
 
 
   useEffect(() => {
@@ -240,10 +251,108 @@ const BalanceCard = () => {
 
       {/* --- Analytics Charts --- */}
       <Card className="col-span-1 lg:col-span-1 2xl:col-span-3">
-        <CardHeader className="flex gap-2 items-center">
-          <AreaChartIcon />
-          <p className="text-xl font-bold">Analytics</p>
+        <CardHeader className=" flex items-center justify-between w-full 2xl:hidden" onClick={toggleAnalyticCollapse}>
+          <div className="flex gap-2 items-center">
+            <AreaChartIcon />
+            <p className="text-xl font-bold">Analytics</p>
+          </div>
+          <div className="2xl:hidden">
+            {analyticCollapse ? <ChevronRight /> : <ChevronDown />}
+          </div>
         </CardHeader>
+        <CardHeader className=" 2xl:flex items-center justify-between w-full hidden" >
+          <div className="flex gap-2 items-center">
+            <AreaChartIcon />
+            <p className="text-xl font-bold">Analytics</p>
+          </div>
+          <div className="2xl:hidden">
+            {analyticCollapse ? <ChevronRight /> : <ChevronDown />}
+          </div>
+        </CardHeader>
+        {/* grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 2xl:gap-6 gap-4 */}
+        <AnimatePresence initial={false}>
+            {!analyticCollapse && (
+          <motion.div
+      key="carouselView"
+      initial={{ height: 0, opacity: 0, scale: 0.9 }}
+      animate={{ height: 'auto', opacity: 1, scale: 1 }}
+      exit={{ height: 0, opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="overflow-hidden"
+    >
+          
+        <CardContent className="">
+          <Carousel className="sm:w-[90%] lg:w-[85%] 2xl:w-full w-[80%] mx-auto">
+            <CarouselContent>
+
+              <CarouselItem className=" md:basis-1/2 lg:basis-full 2xl:basis-1/4">
+                <ChartCard title="Account Balance Trend" subtitle="Past 4 Weeks">
+                  <ReLineChart data={analytics?.balanceTrend || []}>
+                    <XAxis dataKey="name" hide />
+                    <YAxis hide />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="balance" stroke="#34d399" strokeWidth={2} dot={{ r: 4 }} />
+                  </ReLineChart>
+                </ChartCard>
+              </CarouselItem>
+              <CarouselItem className=" md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <ChartCard title="Expense Pattern" subtitle="Weekly Breakdown">
+                <ReBarChart data={analytics?.expensePattern || []}>
+                  <XAxis dataKey="name" hide />
+                  <YAxis hide />
+                  <Tooltip />
+                  <Bar dataKey="expense">
+                    {(analytics?.expensePattern || []).map((_, i) => (
+                      <Cell key={i} fill="#f87171" />
+                    ))}
+                  </Bar>
+                </ReBarChart>
+              </ChartCard>
+              </CarouselItem>
+              <CarouselItem className="  md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <ChartCard title="Budget Utilization" subtitle="Current Cycle">
+                <ReAreaChart data={analytics?.budgetUtilization || []}>
+                  <XAxis dataKey="name" hide />
+                  <YAxis hide />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="expense" stroke="#facc15" fill="#facc15" fillOpacity={0.2} />
+                </ReAreaChart>
+              </ChartCard>
+              </CarouselItem>
+              <CarouselItem className=" md:basis-1/2 lg:basis-full xl:basis-1/4">
+              <ChartCard title="Category Wise Expenditure" subtitle="Spending Habits">
+                <ResponsiveContainer width="100%" height={180}>
+                  <ReBarChart data={analytics?.categoryWise || []} layout="vertical" margin={{ top: 10, right: 10, left: 20, bottom: 10 }}>
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#cbd5e1", fontSize: 12 }} />
+                    <Tooltip />
+                    <Bar dataKey="price" radius={[4, 4, 4, 4]}>
+                      {(analytics?.categoryWise || []).map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </ReBarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="2xl:hidden"/>
+                    <CarouselNext className="2xl:hidden" />
+          </Carousel>
+        </CardContent>
+         </motion.div>
+            )}
+        </AnimatePresence>
+        <AnimatePresence mode="wait">
+  {analyticCollapse && (
+    <motion.div
+      key="gridView"
+      initial={{ height: 0, opacity: 0, scale: 0.9 }}
+      animate={{ height: 'auto', opacity: 1, scale: 1 }}
+      exit={{ height: 0, opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="overflow-hidden"
+    >
         <CardContent className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 2xl:gap-6 gap-4">
           <ChartCard title="Account Balance Trend" subtitle="Past 4 Weeks">
             <ReLineChart data={analytics?.balanceTrend || []}>
@@ -288,7 +397,12 @@ const BalanceCard = () => {
             </ResponsiveContainer>
           </ChartCard>
         </CardContent>
+          </motion.div>
+  )}
+</AnimatePresence>
+    
       </Card>
+      
     </div>
   )
 }

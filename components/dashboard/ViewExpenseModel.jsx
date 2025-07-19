@@ -117,7 +117,7 @@ const ViewExpenseModel = () => {
             {/* Header */}
             <div className="flex justify-between items-start mb-4 gap-2">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 capitalize">
-                {expense.title}
+                {expense.title} 
               </h2>
               <span
                 className={`text-xs font-bold px-3 py-1 rounded-full shadow-inner border 
@@ -131,9 +131,9 @@ const ViewExpenseModel = () => {
 
             {/* Description */}
             <div className="flex items-start gap-2 mb-4 text-sm">
-              <StickyNote className="w-4 h-4 mt-1 text-yellow-500" />
+              <StickyNote className="w-4 h-4 mt-1 flex-shrink-0 text-yellow-500" />
               <p className="italic text-gray-600 dark:text-gray-300 capitalize">
-                {expense.description || 'No description provided.'}
+                {expense.description || 'No description provided.'} 
               </p>
             </div>
 

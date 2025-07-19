@@ -23,7 +23,7 @@ const ExpensesShortcuts = () => {
     <>
       <div className="border p-4  xl:rounded-2xl rounded-2xl bg-transparent ">
         <div className="flex gap-2 items-center">
-          <ShoppingBag className="w-6" />
+          <ShoppingBag size={18}  />
           <p className="text-xl font-bold">Recent Transactions</p>
         </div>
 

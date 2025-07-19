@@ -34,50 +34,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { closeAddExpense } from '@/store/slices/uiSlice'
 import { addExpense } from '@/store/slices/dashboard/expensesSlice'
 import { creditCategories, debitCategories } from '../../utils/helper'
-import { z } from 'zod'
 import { fetchDashboard } from '../../utils/dashboardFetch'
-
-const expenseSchema = z.object({
-  title: z
-    .string({ required_error: 'Title is required' })
-    .min(3, 'Title must be at least 3 characters'),
-
-  description: z.string().optional(),
-
-  amount: z
-    .string({ required_error: 'Amount is required' })
-    .refine((val) => !isNaN(val) && Number(val) > 0, {
-      message: 'Amount must be a positive number',
-    }),
-
-  category: z
-    .string({ required_error: 'Category is required' })
-    .min(1, 'Category is required'),
-
-  type: z
-    .string({ required_error: 'Type is required' })
-    .min(1, 'Type is required') // 🚫 catches empty string
-    .refine((val) => ['credit', 'debit'].includes(val), {
-      message: 'Invalid type',
-    }),
-
-  paymentMethod: z
-    .string({ required_error: 'Payment method is required' })
-    .min(1, 'Payment method  is required') // 🚫 catches empty string
-    .refine((val) => ['upi', 'cash', 'card', 'netbanking', 'other'].includes(val), {
-      message: 'Invalid payment method',
-    }),
-
-  date: z
-  .instanceof(Date, { message: "Invalid date" })
-  .refine((val) => !isNaN(val.getTime()), { message: "Invalid date format" }),
-
-  time: z
-    .string({ required_error: 'Time is required' })
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-      message: 'Invalid time format (HH:mm)',
-    }),
-})
+import { expenseSchema } from '../../lib/ValidationSchema'
 
 
 const AddExpenseModel = () => {
@@ -198,14 +156,22 @@ const AddExpenseModel = () => {
 
           <div className=" space-y-5 mt-3 overflow-y-auto ">
             <div className="grid gap-2">
-              <Label htmlFor="title" className="text-base">Title</Label>
-              <Input id="title" name="title" className='text-base' value={form.title} onChange={handleChange} required />
+              <Label htmlFor="title" className="text-base">Title 
+                <span className="ml-2 text-xs text-gray-500">
+                  ({25 - (form.title?.length || 0)} characters left)
+                </span>
+              </Label>
+              <Input id="title" name="title" maxLength={25} className='text-base' value={form.title} onChange={handleChange} required />
               {errors.title && <p className="text-sm text-red-500">{errors.title[0]}</p>}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="description" className="text-base">Description</Label>
-              <Textarea name="description" className='text-base' value={form.description} onChange={handleChange} />
+              <Label htmlFor="description" className="text-base">Description
+                <span className="ml-2 text-xs text-gray-500">
+                  ({200 - (form.description?.length || 0)} characters left)
+                </span>
+              </Label>
+              <Textarea name="description" maxLength={200} className='text-base' value={form.description} onChange={handleChange} />
               {errors.description && <p className="text-sm text-red-500">{errors.description[0]}</p>}
 
             </div>
@@ -221,6 +187,9 @@ const AddExpenseModel = () => {
                       type="number"
                       className="pl-8 text-base w-full"
                       value={form.amount}
+                      min={0} 
+                      max={9999999.99} 
+                      step="0.01"
                       onChange={handleChange}
                       required
                     />

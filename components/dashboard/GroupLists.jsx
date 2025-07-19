@@ -39,7 +39,7 @@ const GroupLists = () => {
   return (
     <div className="border p-4 xl:rounded-2xl rounded-2xl bg-transparent  w-full">
         <div className="flex gap-2 items-center">
-          <Users className="w-5" />
+          <Users size={17} />
           <p className="text-xl font-bold">All Groups</p>
         </div>
         <hr className='mt-5'/>

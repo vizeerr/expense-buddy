@@ -23,18 +23,20 @@ export default function Greeting() {
 
   const hour = now.getHours()
 
-  const greeting = (() => {
-    if (hour < 12) return 'Good Morning'
-    if (hour < 17) return 'Good Afternoon'
-    if (hour < 20) return 'Good Evening'
-    return 'Good Night'
-  })()
+ const greeting = (() => {
+  if (hour >= 4 && hour < 12) return 'Good Morning'
+  if (hour >= 12 && hour < 17) return 'Good Afternoon'
+  if (hour >= 17 && hour < 20) return 'Good Evening'
+  return 'Good Night'
+})()
+
 
   const icon = (() => {
-    if (hour < 12) return <Sun size={40} className="text-yellow-400" />
-    if (hour < 17) return <Sunrise size={40} className="text-orange-300" />
-    if (hour < 20) return <Sunset size={40} className="text-pink-400" />
-    return <Moon size={40} className="text-indigo-400" />
+    if (hour >= 4 && hour < 12) return <Sun size={40} className="text-yellow-400" />
+    if (hour >= 12 && hour < 17) return <Sunrise size={40} className="text-orange-300" />
+    if (hour >= 17 && hour < 20) return <Sunset size={40} className="text-pink-400" />
+    
+    return <Moon size={40} className="text-neutral-500" />
   })()
 
   const formattedTime = now.toLocaleTimeString([], {

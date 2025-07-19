@@ -263,7 +263,7 @@ const BalanceCard = () => {
         </CardHeader>
         <CardHeader className=" 2xl:flex items-center justify-between w-full hidden px-4" >
           <div className="flex gap-2 items-center">
-            <AreaChartIcon />
+            <AreaChartIcon size={19}/>
             <p className="text-xl font-bold">Analytics</p>
           </div>
           <div className="2xl:hidden">

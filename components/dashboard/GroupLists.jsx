@@ -37,7 +37,7 @@ const GroupLists = () => {
  
  
   return (
-    <div className="border p-4 xl:rounded-2xl rounded-2xl bg-transparent drop-shadow-2xl drop-shadow-orange-900 w-full">
+    <div className="border p-4 xl:rounded-2xl rounded-2xl bg-transparent  w-full">
         <div className="flex gap-2 items-center">
           <Users className="w-5" />
           <p className="text-xl font-bold">All Groups</p>
@@ -56,7 +56,7 @@ const GroupLists = () => {
           {groups.map((group, index) => (
             <CarouselItem
               key={index}
-              className=" md:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
+              className="drop-shadow-2xl drop-shadow-orange-900 md:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
               onClick={() => router.push(`/dashboard/groups/${group._id}`)}
             >
               <Card className="hover:border-primary hover:shadow-md transition-all duration-200 h-full bg-transparent">

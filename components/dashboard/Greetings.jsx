@@ -1,25 +1,63 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { CalendarDays, Clock, Sun, Moon, Sunrise, Sunset } from 'lucide-react'
 
 export default function Greeting() {
-  const user = useSelector((state) => state.auth?.user) // adjust as per your state shape
-  const name = user?.name || '...'
+  const user = useSelector((state) => state.auth?.user)
+  const name = user?.name || 'User'
 
-  const getGreeting = () => {
-    const hour = new Date().getHours()
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const hour = now.getHours()
+
+  const greeting = (() => {
     if (hour < 12) return 'Good Morning'
     if (hour < 17) return 'Good Afternoon'
     if (hour < 20) return 'Good Evening'
     return 'Good Night'
-  }
+  })()
+
+  const icon = (() => {
+    if (hour < 12) return <Sun size={40} className="text-yellow-400" />
+    if (hour < 17) return <Sunrise size={40} className="text-orange-300" />
+    if (hour < 20) return <Sunset size={40} className="text-pink-400" />
+    return <Moon size={40} className="text-indigo-400" />
+  })()
+
+  const formattedTime = now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  const formattedDate = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
 
   return (
-    <div className="px-2">
-      <h2 className="xl:text-xl text-lg text-neutral-400 drop-shadow-2xl drop-shadow-amber-700 ">
-        {getGreeting()}, <br/> <span className="xl:text-2xl text-2xl mt font-medium text-neutral-300 italic capitalize">{name}</span>
-      </h2>
+    <div className="p-6 rounded-2xl  border  w-full drop-shadow-2xl drop-shadow-amber-700">
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white leading-snug mb-2">{formattedTime}</h2>
+          <p className="text-lg text-neutral-300">
+            {greeting},{' '}
+            <span className="text-amber-400 font-semibold italic capitalize">{name}</span>
+          </p>
+          <p className="text-sm text-neutral-400 mt-2 flex items-center gap-1">
+            <CalendarDays size={16} />
+            {formattedDate}
+          </p>
+        </div>
+        <div className="ml-4">{icon}</div>
+      </div>
     </div>
   )
 }

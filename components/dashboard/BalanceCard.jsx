@@ -42,7 +42,7 @@ const COLORS = [
 ]
 
 const ChartCard = ({ title, subtitle, children }) => (
-  <Card className="bg-transparent">
+  <Card className="bg-transparent drop-shadow-2xl drop-shadow-fuchsia-950">
     <CardHeader>
       <p className="text-sm font-medium text-muted-foreground">{title}</p>
       <p className="text-xs text-muted-foreground">{subtitle}</p>
@@ -73,7 +73,7 @@ const BalanceCard = () => {
   }, [dispatch])
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-4 gap-8 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-4 gap-5 items-start">
       
       {/* --- Accounts Card --- */}
       <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950 py-4">
@@ -82,7 +82,7 @@ const BalanceCard = () => {
           className="flex items-center justify-between cursor-pointer px-4 py-1"
         >
           <div className="flex items-center gap-2">
-            <Wallet />
+            <Wallet size={19}/>
             <p className="text-xl font-bold">Accounts</p>
           </div>
           {accountCollapse ? <ChevronRight /> : <ChevronDown />}
@@ -139,7 +139,7 @@ const BalanceCard = () => {
           className="flex items-center justify-between cursor-pointer px-4 "
         >
           <div className="flex gap-2 items-center" onClick={toggleExpenseCollapse}>
-            <Wallet />
+            <Wallet size={19} />
             <p className="text-xl font-bold">Expenses</p>
           </div>
           <div className="flex gap-2 items-center">
@@ -199,7 +199,7 @@ const BalanceCard = () => {
           className="flex items-center justify-between cursor-pointer px-4"
         >
           <div className="flex gap-2 items-center" onClick={toggleBudgetCollapse}>
-            <BadgeDollarSign />
+            <BadgeDollarSign size={19}/>
             <p className="text-xl font-bold">Budget</p>
           </div>
 
@@ -254,7 +254,7 @@ const BalanceCard = () => {
       <Card className="col-span-1 lg:col-span-1 2xl:col-span-3  bg-transparent   py-4">
         <CardHeader className=" flex items-center justify-between w-full 2xl:hidden px-4" onClick={toggleAnalyticCollapse}>
           <div className="flex gap-2 items-center">
-            <AreaChartIcon />
+            <AreaChartIcon size={19}/>
             <p className="text-xl font-bold">Analytics</p>
           </div>
           <div className="2xl:hidden">

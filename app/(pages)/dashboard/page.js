@@ -7,7 +7,7 @@ import GroupLists from '../../../components/dashboard/GroupLists'
 
 const page = () => {
   return (
-    <div className='xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto md:space-y-5 space-y-5 pt-20 pb-16'>
+    <div className='xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto md:space-y-5 space-y-5 pt-20 pb-18'>
       <Greeting/>
       <BalanceCard/>
       {/* <Highlights/> */}

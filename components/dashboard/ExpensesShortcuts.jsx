@@ -59,8 +59,8 @@ const ExpensesShortcuts = () => {
           </div>
 
           <div className="w-full flex justify-center mt-5">
-            <Button asChild>
-              <Link href="/dashboard/expenses">View All</Link>
+            <Button asChild className='bg-transparent border-neutral-600 border text-white drop-shadow-2xl drop-shadow-accent-foreground hover:text-black'>
+              <Link href="/dashboard/expenses">Show All</Link>
             </Button>
           </div>
         </div>

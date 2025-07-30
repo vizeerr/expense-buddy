@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import GroupExpense from '@/lib/models/GroupExpense'
-import Group from '@/lib/models/Group'
+
+
+import { verifyUser } from '@/lib/auth/VerifyUser'
+import { verifyGroup } from '@/lib/auth/VerifyGroup'
+
 
 const getMonth = (date) => new Date(date).getMonth()
 const getYear = (date) => new Date(date).getFullYear()
@@ -16,36 +17,14 @@ const getWeek = (date) => {
 
 export async function GET(req, { params }) {
   try {
-    const { id: groupId } = await params
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No token' }, { status: 401 })
-    }
-
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.log(err);
-      
-      return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 })
-    }
-
-    await dbConnect()
-
-    const userId = decoded._id
-    const group = await Group.findById(groupId).lean()
-
-    if (!group) {
-      return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
-    }
-
-    const isMember = group.members.some(m => m.user.toString() === userId)
-    if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Forbidden: Not a group member' }, { status: 403 })
-    }
+     const { success, user, response } = await verifyUser()
+           if (!success) return response    
+           
+           const { id: groupId } = await params
+           const userId = await user._id
+           const { success:groupSuccess, response:groupResponse } = await verifyGroup(groupId,userId )
+           if (!groupSuccess) return groupResponse
+       
 
     // ✅ Fetch non-trashed debit expenses only
     const expenses = await GroupExpense.find({

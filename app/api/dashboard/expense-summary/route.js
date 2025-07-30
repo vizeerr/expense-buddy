@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
+import { verifyUser } from '../../../../lib/auth/VerifyUser'
 
 // Helpers
 const getMonth = (date) => new Date(date).getMonth()
@@ -16,19 +14,12 @@ const getWeek = (date) => {
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    await dbConnect()
-
+   const { success, user, response } = await verifyUser()
+  if (!success) return response    
+   
     // ✅ Fetch only non-trashed debit expenses
     const expenses = await Expense.find({
-      userEmail: decoded.email,
+      userEmail: user.email,
       type: 'debit',
       trashed: { $ne: true } // 👈 ignore trashed:true
     })

@@ -10,27 +10,27 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useEffect } from "react";
-import { fetchBalanceSummary } from '@/store/slices/dashboard/balanceSlice'
-import { fetchExpensesSummary } from '@/store/slices/dashboard/expensesSummarySlice'
+import { fetchDashboard } from "../../utils/dashboardFetch";
 
 const ExpenseCard = () => {
 
   const { summary, loading: balanceLoading } = useSelector(state => state.balance)
   const dispatch = useDispatch()
+    
     useEffect(() => {
-      dispatch(fetchBalanceSummary())
-      dispatch(fetchExpensesSummary())
-    }, [dispatch])
+    fetchDashboard(dispatch)
+  }, [dispatch])
   
 
   return (
     <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
-      <Card className="gap-1 bg-neutral-900 ">
-                  <CardHeader>
-                      <CardTitle className="text-base font-semibold text-neutral-200">Credit Summary</CardTitle>
+      <Card className="gap-1 bg-transparent border drop-shadow-2xl drop-shadow-green-500 py-4  ">
+                  <CardHeader className="px-4">
+                      <CardTitle className="text-base font-semibold text-neutral-200 mb-1">Credit Summary</CardTitle>
+                      <hr />
                   </CardHeader>
-                  <CardContent>
-                      <div className="text-xs text-neutral-400 space-y-2">
+                  <CardContent className="px-4">
+                      <div className="text-xs text-neutral-400 space-y-2 mt-2">
                       <div className="space-y-1">
                         <div className="flex  text-sm justify-between">
                           <span>Overall Today Total</span>
@@ -59,12 +59,13 @@ const ExpenseCard = () => {
                   
               </Card>
 
-         <Card className="gap-1 bg-neutral-900 ">
-                  <CardHeader>
-                      <CardTitle className="text-base font-semibold text-neutral-200">Debit Summary</CardTitle>
+         <Card className="gap-1 bg-transparent border drop-shadow-2xl drop-shadow-red-500 py-4 ">
+                  <CardHeader className="px-4">
+                      <CardTitle className="text-base font-semibold text-neutral-200 mb-1">Debit Summary</CardTitle>
+                       <hr />
                   </CardHeader>
-                  <CardContent>
-                      <div className="text-xs text-neutral-400 space-y-2">
+                  <CardContent className="px-4">
+                      <div className="text-xs text-neutral-400 space-y-2 mt-2">
                       <div className="space-y-1">
                         <div className="flex  text-sm justify-between">
                           <span>Overall Today Total</span>

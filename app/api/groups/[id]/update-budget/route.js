@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
 import dbConnect from '@/lib/mongodb'
 import Group from '@/lib/models/Group'
 import { z } from 'zod'
+
+import { verifyUser } from '@/lib/auth/VerifyUser'
+
 
 // ✅ Zod schema for validation
 const BudgetSchema = z.object({
@@ -12,23 +13,12 @@ const BudgetSchema = z.object({
 
 export async function PUT(req, { params }) {
   try {
-    const { id:groupId } = await params
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-    }
-
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-        console.log(err);
-      return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
-    }
-
-    const userId = decoded._id
+   const { success, user, response } = await verifyUser()
+           if (!success) return response    
+           
+           const { id: groupId } = await params
+           const userId = await user._id
+          
     const body = await req.json()
     const parsed = BudgetSchema.safeParse(body)
 
@@ -44,10 +34,10 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
     }
 
-    const isMember = group.members.some(member => member.user.toString() === userId)
-    if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Access denied: Not a group member' }, { status: 403 })
-    }
+    const isMember = group.owner.equals(userId) || group.members.some(m => m.user.equals(userId))
+      if (!isMember) {
+        return NextResponse.json({ success: false, message: 'Not a group member' }, { status: 403 })
+      }
 
     group.monthlyBudget = parsed.data.budget
     await group.save()

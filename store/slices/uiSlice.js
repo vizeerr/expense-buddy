@@ -14,7 +14,7 @@ const uiSlice = createSlice({
     
     isEditGroupOpen:false,
     isInviteGroupOpen:false,
-    isManageMembersOpen:true,
+    isManageMembersOpen:false,
 
     // Expense modals (personal)
     viewExpense: { open: false, id: null },

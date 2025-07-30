@@ -36,7 +36,7 @@ import { filterExpenses } from '@/utils/helper'
 import { closeEditExpense } from '@/store/slices/uiSlice'
 import { creditCategories, debitCategories } from '../../utils/helper'
 import { fetchDashboard } from '../../utils/dashboardFetch'
-import { expenseSchema } from '../../lib/ValidationSchema'
+import { expenseSchema } from '@/lib/schemas/ValidationSchema'
 
 
 
@@ -117,7 +117,13 @@ const EditExpenseModel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const parsed = expenseSchema.safeParse(form)
+    const payload = {
+        ...form,
+        _id: editExpense.id,
+        amount: form.amount.toString(),
+        date: form.date.toISOString().split('T')[0],
+      }
+    const parsed = expenseSchema.safeParse(payload)
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors
       setErrors(fieldErrors)
@@ -127,12 +133,7 @@ const EditExpenseModel = () => {
 
     setLoading(true)
     try {
-      const payload = {
-        ...form,
-        _id: editExpense.id,
-        amount: form.amount.toString(),
-        date: form.date.toISOString().split('T')[0],
-      }
+      
 
       const res = await axios.put(`/api/expenses/modify-expense/`, payload)
       if (res.status === 200) {

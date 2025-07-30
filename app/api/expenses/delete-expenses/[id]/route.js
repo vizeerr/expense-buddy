@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
 import mongoose from 'mongoose'
-import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
-import User from '@/lib/models/User'
+import { verifyUser } from '@/lib/auth/VerifyUser'
 
 // DELETE /api/expenses/:id
 export async function DELETE(req, { params }) {
@@ -20,33 +17,14 @@ export async function DELETE(req, { params }) {
     }
 
     // 🍪 Get auth token from cookies
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
-
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.error('JWT Error:', err)
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
-
-    await dbConnect()
-
-    // ✅ Step 2: Check if user still exists in DB
-    const user = await User.findOne({ email: decoded.email })
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
+    const { success, user, response } = await verifyUser()
+    if (!success) return response
+  
 
     // 🔐 Attempt to delete only if owned by user
     const deletedExpense = await Expense.findOneAndDelete({
       _id: id,
-      userEmail: decoded.email,
+      userEmail: user.email,
     })
 
     if (!deletedExpense) {
@@ -60,7 +38,7 @@ export async function DELETE(req, { params }) {
     })
 
   } catch (err) {
-    console.error('Expense Delete Error:', err)
+      console.error('Expense Delete Error:', err)
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
   }
 }

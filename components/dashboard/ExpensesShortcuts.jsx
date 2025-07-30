@@ -58,9 +58,9 @@ const ExpensesShortcuts = () => {
             {error && <p className="text-red-500 text-sm">Error: {error}</p>}
           </div>
 
-          <div className="w-full flex justify-center mt-5">
-            <Button asChild className='bg-transparent border-neutral-600 border text-white drop-shadow-2xl drop-shadow-accent-foreground hover:text-black'>
-              <Link href="/dashboard/expenses">Show All</Link>
+          <div className="w-full flex justify-center mt-4">
+            <Button size="sm" variant="ghost" asChild className='bg-transparent  text-neutral-400 drop-shadow-2xl drop-shadow-accent-foreground xl:hover:text-white'>
+              <Link href="/dashboard/expenses">Show all</Link>
             </Button>
           </div>
         </div>

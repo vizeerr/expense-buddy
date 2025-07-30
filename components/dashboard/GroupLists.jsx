@@ -19,7 +19,9 @@ import {
 } from '@/components/ui/card'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Users } from 'lucide-react'
+import {Button} from '@/components/ui/button'
+import { Plus, Users } from 'lucide-react'
+import{openAddGroup} from '@/store/slices/uiSlice'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchGroups } from '@/store/slices/group/groupSlice'
@@ -38,13 +40,19 @@ const GroupLists = () => {
  
   return (
     <div className="border p-4 xl:rounded-2xl rounded-2xl bg-transparent  w-full">
+      <div className='flex items-center justify-between'>
         <div className="flex gap-2 items-center">
           <Users size={17} />
           <p className="text-xl font-bold">All Groups</p>
         </div>
+        <Button size="sm"  className ="bg-transparent border border-green-500 text-green-500 drop-shadow-xl drop-shadow-green-600" onClick={()=>dispatch(openAddGroup())}>
+            <Plus/>
+            Create Group
+          </Button>
+      </div>
         <hr className='mt-5'/>
         {loading && (!groups || groups.length === 0) && <div className="text-muted-foreground text-center py-8">
-        You are not part of any groups yet.
+        You are not part of any groups yet or create a new group.
       </div>}
         {loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
         {[...Array(3)].map((_, i) => (

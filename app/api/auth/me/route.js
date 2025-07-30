@@ -1,46 +1,10 @@
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
 import { NextResponse } from 'next/server'
-import dbConnect from '@/lib/mongodb'
-import User from '@/lib/models/User'
-
+import { verifyUser } from '../../../../lib/auth/VerifyUser'
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({
-        user: null,
-        authenticated: false,
-        message: 'Authentication token missing'
-      }, { status: 401 })
-    }
-
-    // Decode and verify token
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.log(err);
-      return NextResponse.json({
-        user: null,
-        authenticated: false,
-        message: 'Invalid or expired token'
-      }, { status: 401 })
-    }
-
-    await dbConnect()
-
-    const user = await User.findOne({ email: decoded.email })
-
-    if (!user || !user.isActive) {
-      return NextResponse.json({
-        user: null,
-        authenticated: false,
-        message: 'User does not exist or is inactive'
-      }, { status: 401 })
-    }
+    const { success, user, response } = await verifyUser()
+     if (!success) return response    
+     
 
     const safeUser = {
       _id: user._id,
@@ -55,7 +19,7 @@ export async function GET() {
     }, { status: 200 })
 
   } catch (error) {
-    console.error('[GET /api/auth/me]', error)
+    console.error('User Auth', error)
     return NextResponse.json({
       authenticated: false,
       user: null,

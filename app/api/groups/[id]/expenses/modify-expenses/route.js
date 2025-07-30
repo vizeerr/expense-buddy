@@ -1,43 +1,66 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-
-import dbConnect from '@/lib/mongodb'
-import Group from '@/lib/models/Group'
 import User from '@/lib/models/User'
 import GroupExpense from '@/lib/models/GroupExpense'
+import { verifyGroup } from '../../../../../../lib/auth/VerifyGroup'
+import { verifyUser } from '../../../../../../lib/auth/VerifyUser'
 
 const GroupExpenseSchema = z.object({
   _id: z.string().min(1, 'Expense ID is required'),
-  title: z.string().min(2, 'Title must be at least 2 characters'),
-  description: z.string().optional(),
-  amount: z.string().refine(val => !isNaN(val) && Number(val) > 0, {
-    message: 'Amount must be a positive number',
+  title: z
+    .string({ required_error: 'Title is required' })
+    .min(3, 'Title must be at least 3 characters')
+    .max(25, "Max 25 characters"),
+
+  description: z.string().max(200, "Max 200 characters").optional(),
+
+  amount: z
+    .string({ required_error: 'Amount is required' })
+     .refine((val) => {
+    const num = parseFloat(val)
+    return !isNaN(num) && num > 0 && num <= 9999999.99
+  }, {
+    message: 'Amount must be a valid between 0 and 9999999.99',
   }),
-  category: z.string().min(1, 'Category is required'),
-  type: z.enum(['credit', 'debit']),
-  paymentMethod: z.enum(['upi', 'cash', 'card', 'netbanking', 'other']),
-  paidBy: z.string().min(1, 'PaidBy is required'),
-  groupId: z.string().min(1, 'Group ID is required'),
-  date: z.string().refine(val => !isNaN(Date.parse(val)), {
+
+  category: z
+    .string({ required_error: 'Category is required' })
+    .min(1, 'Category is required'),
+
+  type: z
+    .string({ required_error: 'Type is required' })
+    .min(1, 'Type is required') // 🚫 catches empty string
+    .refine((val) => ['credit', 'debit'].includes(val), {
+      message: 'Invalid type',
+    }),
+
+  paymentMethod: z
+    .string({ required_error: 'Payment method is required' })
+    .min(1, 'Payment method  is required') // 🚫 catches empty string
+    .refine((val) => ['upi', 'cash', 'card', 'netbanking', 'other'].includes(val), {
+      message: 'Invalid payment method',
+    }),
+
+   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid date format',
   }),
-  time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-    message: 'Invalid time format',
-  }),
+  time: z
+    .string({ required_error: 'Time is required' })
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+      message: 'Invalid time format (HH:mm)',
+    }),
+  paidBy: z.string().min(1, 'PaidBy is required'),
+  groupId: z.string().min(1, 'PaidBy is required'),
 })
 
 export async function PUT(req) {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
+    const { success, user, response } = await verifyUser()
+    if (!success) return response    
+       
+    const userId = await user._id
+       
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const body = await req.json()
     const result = GroupExpenseSchema.safeParse(body)
 
@@ -66,25 +89,9 @@ if (!result.success) {
       return NextResponse.json({ success: false, message: 'Invalid datetime' }, { status: 400 })
     }
 
-    await dbConnect()
-
-    const user = await User.findOne({ email: decoded.email }).select('_id email')
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 401 })
-    }
-
-    const newGroup = await Group.findById(groupId)
-    if (!newGroup) {
-      return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
-    }
-
-    const isMember =
-      newGroup.owner.equals(user._id) ||
-      newGroup.members.some((m) => m.user.equals(user._id))
-
-    if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Access denied' }, { status: 403 })
-    }
+    const { success:groupSuccess, response:groupResponse } = await verifyGroup(groupId,userId )
+      if (!groupSuccess) return groupResponse
+   
 
     const paidByUser = await User.findById(paidBy)
 

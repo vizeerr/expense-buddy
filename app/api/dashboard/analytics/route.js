@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
+import { verifyUser } from '../../../../lib/auth/VerifyUser'
 
 const getWeekNumber = (date) => {
   const start = new Date(date.getFullYear(), 0, 1)
@@ -12,23 +10,12 @@ const getWeekNumber = (date) => {
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No token provided' }, { status: 401 })
-    }
-
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.error('JWT Error:', err)
-      return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
-    }
-
-    await dbConnect()
-    const userEmail = decoded.email
+    const { success, user, response } = await verifyUser()
+    if (!success) return response    
+       
+   
+    const userEmail = user.email
 
     // ✅ Only non-trashed expenses
     const expenses = await Expense.find({

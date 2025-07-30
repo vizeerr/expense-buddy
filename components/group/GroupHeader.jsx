@@ -25,7 +25,7 @@ const GroupHeader = () => {
 
   if (loading) {
     return (
-      <div className="border rounded-2xl p-5 md:p-6 bg-black text-white shadow-md space-y-4">
+      <div className="border-2 rounded-2xl p-5 md:p-6 bg-transparent text-white">
         <Skeleton className="h-6 w-1/3" />
         <Skeleton className="h-4 w-1/2 mt-2" />
         <div className="flex gap-4 mt-4">
@@ -65,10 +65,10 @@ const GroupHeader = () => {
       .toUpperCase()
 
   return (
-    <div className="border rounded-2xl p-5 md:p-6 bg-black text-white shadow-md space-y-4">
+    <div className="border-2 border-neutral-500 rounded-2xl p-4 md:p-6 bg-transparent drop-shadow-2xl drop-shadow-amber-700 text-white shadow-md  ">
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-bold">{group.name}</h2>
+          <h2 className="text-2xl font-bold text-amber-400">{group.name}</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {group.description || 'No description provided'}
           </p>
@@ -87,8 +87,8 @@ const GroupHeader = () => {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex gap-6 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between ">
+        <div className="flex gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             Created: {format(new Date(group.createdAt), 'dd MMM yyyy')}
@@ -102,8 +102,8 @@ const GroupHeader = () => {
         <div className="flex items-center gap-2">
           
            <DropdownMenu>
-        <DropdownMenuTrigger className="outline-none ml-4">
-          <MoreHorizontal className="w-8 h-8  bg-neutral-800 p-1.5 rounded-sm text-muted-foreground hover:text-white cursor-pointer" />
+        <DropdownMenuTrigger className="outline-none ">
+          <MoreHorizontal className="w-10 h-10  bg-transparent p-1.5 rounded-sm text-muted-foreground hover:text-white cursor-pointer" />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
@@ -128,13 +128,13 @@ const GroupHeader = () => {
       </div>
 
       {/* Member Avatars */}
-      <div className="flex items-center gap-2 pt-2">
+      <div className="flex items-center mt-1 w-full gap-2 ">
         {members.slice(0, 5).map((m, idx) => (
           <Avatar
             key={m.user?._id || idx}
-            className="h-8 w-8 border border-white/10 bg-neutral-800"
+            className="h-8 w-8 border  border-neutral-700"
           >
-            <AvatarFallback>
+            <AvatarFallback className="bg-transparent text-neutral-400">
               {initials(m.user?.name || m.user?.email || 'U')}
             </AvatarFallback>
           </Avatar>

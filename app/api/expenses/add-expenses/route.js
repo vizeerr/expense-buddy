@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
-import User from '@/lib/models/User'
+import { verifyUser } from '@/lib/auth/VerifyUser'
 
 // 🛡️ Zod schema (unchanged — validate inputs separately)
 const ExpenseSchema = z.object({
@@ -30,29 +27,8 @@ export async function POST(req) {
   
   try {
     
-    await dbConnect()
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
-
-    // ✅ Verify JWT
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.error('JWT Error:', err)
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
-
-    // ✅ Ensure user still exists
-    const user = await User.findOne({ email: decoded.email })
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User no longer exists' }, { status: 401 })
-    }
-
+    const { success, user, response } = await verifyUser()
+    if (!success) return response
 
     const body = await req.json()
     const result = ExpenseSchema.safeParse(body)
@@ -74,7 +50,7 @@ export async function POST(req) {
 
 
     const newExpense = new Expense({
-      userEmail: decoded.email,
+      userEmail: user.email,
       title,
       description: description || '',
       amount: Number(amount),

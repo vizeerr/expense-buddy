@@ -1,34 +1,19 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import Group from '@/lib/models/Group'
 import GroupExpense from '@/lib/models/GroupExpense'
 
+import { verifyUser } from '@/lib/auth/VerifyUser'
 const getMonth = (date) => new Date(date).getMonth()
 const getYear = (date) => new Date(date).getFullYear()
 
 export async function GET(req, { params }) {
   try {
+    
+    const { success, user, response } = await verifyUser()
+    if (!success) return response    
+           
+    const userId = await user._id
     const { id: groupId } = await params
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No token' }, { status: 401 })
-    }
-
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.log(err);
-      
-      return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
-    }
-
-    await dbConnect()
-    const userId = decoded._id
 
     // 🧠 Check if group exists
     const group = await Group.findById(groupId).lean()
@@ -36,11 +21,10 @@ export async function GET(req, { params }) {
       return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
     }
 
-    // ✅ Is user a member of the group?
-    const isMember = group.members.some(m => m.user.toString() === userId)
-    if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Forbidden: Not a group member' }, { status: 403 })
-    }
+   const isMember = group.owner.equals(userId) || group.members.some(m => m.user.equals(userId))
+      if (!isMember) {
+        return NextResponse.json({ success: false, message: 'Not a group member' }, { status: 403 })
+      }
 
     const monthlyBudget = group.monthlyBudget || 0
 

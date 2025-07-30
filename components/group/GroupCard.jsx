@@ -47,15 +47,20 @@ const GroupCard = ({ group }) => {
 
   return (
     <Card onClick={() => router.push(`/dashboard/groups/${group._id}`)} className={cn(
-      "relative border rounded-2xl overflow-hidden bg-[#000000] md:hover:border-white shadow-xl transition duration-100 md:hover:scale-[1.05]"
+      "relative border gap-2  rounded-2xl overflow-hidden bg-transparent drop-shadow-2xl drop-shadow-amber-800 md:hover:border-white shadow-xl transition duration-100 md:hover:scale-[1.05]"
     )}>
-      <CardHeader>
+      <CardHeader >
         <div className="flex justify-between items-start">
-          <div>
+          <div className='flex items-center gap-3'>
+            <div className='bg-amber-950 h-10 w-10 rounded-full border p-2.5'>
+                                <Users className="h-full w-full" />
+                              </div>
+            <div>
             <CardTitle className="text-lg text-white">{group.name}</CardTitle>
             <CardDescription className="text-sm text-muted-foreground line-clamp-2 mt-1">
               {group.description || 'No description'}
             </CardDescription>
+            </div>
           </div>
           {roleBadge && (
             <div className={cn(
@@ -71,24 +76,24 @@ const GroupCard = ({ group }) => {
         </div>
       </CardHeader>
 
-      <CardContent className="text-sm text-muted-foreground space-y-3">
+      <CardContent className=" flex items-center justify-between w-full gap-2 text-sm text-muted-foreground ">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-zinc-400" />
           <span>Created: {format(new Date(group.createdAt), 'dd MMM yyyy')}</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-zinc-400" />
           <span>{members.length} member{members.length !== 1 ? 's' : ''}</span>
-        </div>
+        </div> */}
 
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex items-center gap-2 ">
           {members.slice(0, 3).map((m, idx) => (
             <Avatar
               key={m.user?._id || idx}
-              className="h-7 w-7 border border-white/20 bg-neutral-800"
+              className="h-7 w-7 border border-neutral-700"
             >
-              <AvatarFallback>
+              <AvatarFallback className="bg-transparent text-neutral-400">
                 {initials(m.user?.name || m.user?.email || 'U')}
               </AvatarFallback>
             </Avatar>

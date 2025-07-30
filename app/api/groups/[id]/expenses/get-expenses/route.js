@@ -1,39 +1,17 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
-import dbConnect from '@/lib/mongodb'
-
-import Group from '@/lib/models/Group'
 import GroupExpense from '@/lib/models/GroupExpense'
-import User from '@/lib/models/User'
+import { verifyUser } from '../../../../../../lib/auth/VerifyUser'
+import { verifyGroup } from '../../../../../../lib/auth/VerifyGroup'
 
 export async function GET(req, { params }) {
   try {
-    const { id: groupId } =await params
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
-
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    await dbConnect()
-
-    const user = await User.findOne({ email: decoded.email }).select('_id')
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 401 })
-    }
-
-    const group = await Group.findById(groupId)
-    if (!group) {
-      return NextResponse.json({ success: false, message: 'Group not found' }, { status: 404 })
-    }
-
-    const isMember = group.owner.equals(user._id) || group.members.some(m => m.user.equals(user._id))
-    if (!isMember) {
-      return NextResponse.json({ success: false, message: 'Access denied' }, { status: 403 })
-    }
+    const { success, user, response } = await verifyUser()
+    if (!success) return response    
+    
+    const { id: groupId } = await params
+    const userId = await user._id
+    const { success:groupSuccess, response:groupResponse } = await verifyGroup(groupId,userId )
+    if (!groupSuccess) return groupResponse
 
     // 🔎 Extract filters from query params
     const { searchParams } = new URL(req.url)

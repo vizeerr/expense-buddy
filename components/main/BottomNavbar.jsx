@@ -9,11 +9,15 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
+
+
 import { useSelector,useDispatch } from 'react-redux'
 import { logoutUser } from '@/store/slices/authSlice'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { CirclePlus, House, LogOut, UserRoundCog, Users, Wallet } from 'lucide-react'
+import { Button } from '../ui/button'
+import Link from 'next/link'
 
 const BottomNavbar = () => {
   const user = useSelector((state) => state.auth.user)
@@ -33,34 +37,52 @@ const BottomNavbar = () => {
   
     {user &&
       <div className='fixed bottom-2 z-3 w-full flex justify-center'>
-      <Menubar className='bg-transparent backdrop-blur-2xl h-full rounded-full px-8 py-2 drop-shadow-2xl drop-shadow-accent-foreground'>
-        <MenubarMenu>
-            <MenubarTrigger className='flex flex-col justify-content-center'>
-              <House size={19} />
+
+        <div className='flex border-2 border-neutral-600 bg-transparent backdrop-blur-2xl h-full rounded-full px-4 py-1 drop-shadow-2xl drop-shadow-accent-foreground'>    
+          <Button asChild variant="ghost" size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
+            <Link href="/dashboard">
+              <House size={20} />
+              <p className='text-[0.6rem] text-muted-foreground'>Home</p>
+            </Link>
+          </Button>
+
+          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
+            <Link href="/dashboard/groups">
+              <Users size={20} />
+              <p className='text-[0.6rem] text-muted-foreground'>Group</p>
+            </Link>
+          </Button>
+
+          <Button variant="ghost"  size="lg" className='flex pointer gap-0 p-0 flex-col justify-center items-center'>
             
-              <p className='text-[0.5rem] text-muted-foreground'>Home</p>
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem>
-                Dashboard <MenubarShortcut>⌘T</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>
-                Add Expense <MenubarShortcut>⌘T</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>
-                Update Budget <MenubarShortcut>⌘T</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Share</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Print</MenubarItem>
-            </MenubarContent>
+              <CirclePlus  size={25} className='text-amber-500'/>
+            
+          </Button>
+          
+          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
+            <Link href="/dashboard/expenses">
+              <Wallet size={20} />
+              <p className='text-[0.6rem] text-muted-foreground'>Expenses</p>
+            </Link>
+          </Button>
+          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
+            <Link href="/dashboard/profile">
+              <UserRoundCog size={20} />
+              <p className='text-[0.6rem] text-muted-foreground'>Profile</p>
+            </Link>
+          </Button>
+        </div>
+            
+      {/* <Menubar className=''>
+        <MenubarMenu>
+           
+
           </MenubarMenu>
           <MenubarMenu>
             <MenubarTrigger className='flex flex-col'>
               <Users size={19} />
             
-              <p className='text-[0.5rem] text-muted-foreground'>Groups</p>
+              <p className='text-[0.6rem] text-muted-foreground'>Groups</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -78,11 +100,12 @@ const BottomNavbar = () => {
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
+          
           <MenubarMenu>
             <MenubarTrigger className='flex flex-col'>
               <CirclePlus  size={25} className='text-amber-500'/>
             
-              {/* <p className='text-[0.5rem] text-muted-foreground'>All Expenses</p> */}
+              
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -103,7 +126,7 @@ const BottomNavbar = () => {
             <MenubarTrigger className='flex flex-col'>
               <Wallet size={19} />
             
-              <p className='text-[0.5rem] text-muted-foreground'>All Expenses</p>
+              <p className='text-[0.6rem] text-muted-foreground'>All Expenses</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -123,7 +146,7 @@ const BottomNavbar = () => {
             <MenubarTrigger className='flex flex-col '>
               <UserRoundCog size={19} />
             
-              <p className='text-[0.5rem] text-muted-foreground'>Profile</p>
+              <p className='text-[0.6rem] text-muted-foreground'>Profile</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -140,7 +163,7 @@ const BottomNavbar = () => {
             </MenubarContent>
           </MenubarMenu>
           
-      </Menubar>
+      </Menubar> */}
       </div>
     }
     </>

@@ -1,36 +1,19 @@
 import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
-import dbConnect from '@/lib/mongodb'
 import Expense from '@/lib/models/Expense'
-import User from '@/lib/models/User'
+import { verifyUser } from '../../../../lib/auth/VerifyUser'
 
 const getMonth = (date) => new Date(date).getMonth()
 const getYear = (date) => new Date(date).getFullYear()
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('authToken')?.value
+   const { success, user, response } = await verifyUser()
+       if (!success) return response    
 
-    if (!token) {
-      return NextResponse.json({ success: false, message: 'Unauthorized: No token provided' }, { status: 401 })
-    }
+    const userEmail = user.email
 
-    let decoded
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
-    } catch (err) {
-      console.error('JWT Error:', err)
-      return NextResponse.json({ success: false, message: 'Invalid or expired token' }, { status: 401 })
-    }
-
-    await dbConnect()
-
-    const userEmail = decoded.email
-    const [expenses, user] = await Promise.all([
+    const [expenses] = await Promise.all([
       Expense.find({ userEmail, trashed: { $ne: true } }), // ✅ Ignore trashed expenses
-      User.findOne({ email: userEmail })
     ])
 
     const monthlyBudget = user?.monthlyBudget || 0
@@ -52,9 +35,9 @@ export async function GET() {
     })
 
     const daysUsed = new Set(thisMonthTxns.map(e => new Date(e.datetime).toDateString())).size || 1
-    const usedBudget = thisMonthTxns
+    const usedBudget = Math.min(thisMonthTxns
       .filter(e => e.type === 'debit')
-      .reduce((sum, e) => sum + e.amount, 0)
+      .reduce((sum, e) => sum + e.amount, 0),monthlyBudget )
 
     const remainingBudget = Math.max(monthlyBudget - usedBudget, 0)
     const dailyAverage = usedBudget / daysUsed

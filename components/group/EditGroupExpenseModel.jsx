@@ -38,6 +38,7 @@ const EditGroupExpenseModal = () => {
   )
 
   const [form, setForm] = useState({
+    _id:"",
     title: '',
     description: '',
     amount: '',
@@ -61,6 +62,7 @@ const EditGroupExpenseModal = () => {
     if (!existingExpense) return
     const dt = new Date(existingExpense.datetime)
     setForm({
+      _id:existingExpense._id,
       title: existingExpense.title || '',
       description: existingExpense.description || '',
       amount: existingExpense.amount || '',
@@ -105,7 +107,6 @@ const EditGroupExpenseModal = () => {
     }
     return true
   }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -118,7 +119,6 @@ const EditGroupExpenseModal = () => {
         date: form.date.toISOString().split('T')[0],
         time: form.time,
       }
-
       const res = await fetch(`/api/groups/${form.groupId}/expenses/modify-expenses`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

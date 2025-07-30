@@ -14,15 +14,15 @@ const TopNavbar = () => {
       </div>
       <div className='flex items-center gap-5'>
         
-        {!user && 
+        
       
-          <Button aschild variant="ghost" className='bg-white text-black'>
+          <Button aschild variant="ghost" className={`${!user?"black":"hidden"} bg-white text-black`}>
           <Link href="/login">  
             Login
           </Link>
         </Button>  
           
-        }
+        
         
       </div>
     </div>

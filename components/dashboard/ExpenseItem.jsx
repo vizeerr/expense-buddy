@@ -92,7 +92,7 @@ const ExpenseItem = ({ expense }) => {
       if (res.status === 200) {
         dispatch(deleteExpenseAction(expense._id))
         dispatch(closeViewExpense())
-        fetchDashboard(dispatch)
+        fetchDashboard(dispatch,{force:true})
         toast.success((t) => (
           <span className="flex items-center gap-2">
             Moved to <b>Trash</b>
@@ -120,16 +120,10 @@ const ExpenseItem = ({ expense }) => {
         dispatch(setFilters({ search: '', type: '', category: '', trashed: "true" }))
         dispatch(deleteExpenseAction(expense._id))
         dispatch(closeViewExpense())
-        fetchDashboard(dispatch)
+        fetchDashboard(dispatch,{force:true})
         toast.success((t) => (
           <span className="flex items-center gap-2">
-            Moved to <b>Trash</b>
-            <Button
-              onClick={() => {restoreExpense(); toast.dismiss(t.id)}}
-              size={"sm"}
-            >
-              Undo
-            </Button>
+            Removed <b>Permanently</b>
           </span>
         ), { id: toastId, duration: 5000 })
       }
@@ -145,10 +139,8 @@ const ExpenseItem = ({ expense }) => {
     try {
       const res = await axios.put(`/api/expenses/restore-expenses/${expense._id}`)
       if(res.status==200){
-        dispatch(setFilters({ search: '', type: '', category: '', trashed: "false" }))
-        fetchDashboard(dispatch)
-
-        toast.success("Restored successfully")
+        dispatch(setFilters({ search: '', type: '', category: '', trashed: "true" }))
+        fetchDashboard(dispatch,{force:true})
         toast.success((t) => (
           <span className="flex items-center gap-2">
             Restoring from <b>Trash</b>
@@ -197,7 +189,7 @@ const ExpenseItem = ({ expense }) => {
             </div>
             <p className="text-xs text-neutral-400">{formattedDate}</p>
           </div>
-<div className='space-y-3'>
+<div className='space-y-3 flex flex-col justify-end items-end'>
   <div className="py-1 px-3 text-center rounded-full border border-amber-600 text-amber-600 drop-shadow-xl drop-shadow-amber-700 bg-transparent text-[0.65rem] capitalize font-semibold">
             {expense.paymentMethod || "Other"}
           </div>
@@ -234,7 +226,7 @@ const ExpenseItem = ({ expense }) => {
 
         <DropdownMenuContent
           align="end"
-          className="w-40 bg-neutral-900 border border-neutral-800"
+          className="w-40 bg-transparent border drop-shadow-2xl drop-shadow-neutral-600 backdrop-blur-2xl"
         >
           <DropdownMenuItem onClick={(e) => {e.stopPropagation(); dispatch(openViewExpense(expense._id))}} className="cursor-pointer">
             <Eye className="w-4 h-4 mr-2" /> View
@@ -242,8 +234,8 @@ const ExpenseItem = ({ expense }) => {
           <DropdownMenuItem onClick={(e) => {e.stopPropagation(); dispatch(openEditExpense(expense._id))}} className="cursor-pointer">
             <Pencil className="w-4 h-4 mr-2" /> Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-500">
-            <Trash2 className="w-4 h-4 mr-2" /> Delete
+          <DropdownMenuItem onClick={(e)=> {e.stopPropagation(); handleDelete()}} className="cursor-pointer text-red-500">
+            <Trash2 className="w-4 h-4 mr-2" /> Trash
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

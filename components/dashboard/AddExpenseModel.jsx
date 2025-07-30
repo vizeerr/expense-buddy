@@ -35,7 +35,7 @@ import { closeAddExpense } from '@/store/slices/uiSlice'
 import { addExpense } from '@/store/slices/dashboard/expensesSlice'
 import { creditCategories, debitCategories } from '../../utils/helper'
 import { fetchDashboard } from '../../utils/dashboardFetch'
-import { expenseSchema } from '../../lib/ValidationSchema'
+import { expenseSchema } from '@/lib/schemas/ValidationSchema'
 
 
 const AddExpenseModel = () => {
@@ -98,7 +98,12 @@ const AddExpenseModel = () => {
     setErrors({})
     
     // if (!validateForm()) return
-    const parsed = expenseSchema.safeParse(form)
+    const payload = {
+        ...form,
+        date: form.date.toISOString().split('T')[0],
+        time: form.time,
+    }
+    const parsed = expenseSchema.safeParse(payload)
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors
       setErrors(fieldErrors)
@@ -108,11 +113,7 @@ const AddExpenseModel = () => {
 
     setLoading(true)
     try {
-      const payload = {
-        ...form,
-        date: form.date.toISOString().split('T')[0],
-        time: form.time,
-      }
+      
 
       const res = await axios.post('/api/expenses/add-expenses', payload)
       if (res.status === 200) {
@@ -128,7 +129,7 @@ const AddExpenseModel = () => {
           time: new Date().toTimeString().slice(0, 5),
         })
         dispatch(addExpense(res.data.expenses))
-        fetchDashboard(dispatch)
+        fetchDashboard(dispatch,{force:true})
       }
     } catch (err) {
       console.error(err)
@@ -138,6 +139,7 @@ const AddExpenseModel = () => {
     }
   }
 
+  
   return (
     <Sheet open={isOpen} onOpenChange={handleClose}>
       <SheetContent

@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-// Async thunk to fetch expenses with filters & pagination
+// ✅ Async thunk with date filter support
+// slices/dashboard/expensesSlice.js
 export const fetchExpenses = createAsyncThunk(
   'expenses/fetchExpenses',
-  async ({ page = 1, limit = 10, search = '', type = '', category = '', paymentMethod = '', trashed = "false" }, thunkAPI) => {
+  async ({ page = 1, limit = 10, search = '', type = '', category = '', paymentMethod = '', trashed = "false", fromDate = '', toDate = '' }, thunkAPI) => {
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -12,7 +13,9 @@ export const fetchExpenses = createAsyncThunk(
         ...(type && { type }),
         ...(category && { category }),
         ...(paymentMethod && { paymentMethod }),
-        trashed: String(trashed), // 🧠 Always explicitly include trashed filter
+        trashed: String(trashed),
+        ...(fromDate && { fromDate }),
+        ...(toDate && { toDate }),
       })
 
       const res = await fetch(`/api/expenses/get-all-expenses?${params.toString()}`)
@@ -30,6 +33,7 @@ export const fetchExpenses = createAsyncThunk(
   }
 )
 
+
 const expensesSlice = createSlice({
   name: 'expenses',
   initialState: {
@@ -43,7 +47,9 @@ const expensesSlice = createSlice({
       type: '',
       category: '',
       paymentMethod: '',
-      trashed: "false", // 🔍 Show active expenses by default
+      trashed: 'false',
+      fromDate: '', // ✅ Added
+      toDate: '',   // ✅ Added
     },
   },
   reducers: {

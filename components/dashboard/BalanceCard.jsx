@@ -66,8 +66,6 @@ const BalanceCard = () => {
   const [budgetCollapse, toggleBudgetCollapse] = useLocalCollapse('budget-card') || "false"
   const [analyticCollapse, toggleAnalyticCollapse] = useLocalCollapse('analytic-card') || "false"
 
-
-
   useEffect(() => {
     fetchDashboard(dispatch)
   }, [dispatch])
@@ -204,7 +202,7 @@ const BalanceCard = () => {
           </div>
 
           <div className="flex gap-2 items-center">
-           <Button size=""  className="rounded-sm bg-transparent border border-amber-500 text-amber-500 drop-shadow-xl drop-shadow-amber-600" onClick={() => dispatch(openAddBudget())}>
+           <Button size="sm"  className="rounded-sm bg-transparent border border-amber-500 text-amber-500 drop-shadow-xl drop-shadow-amber-600" onClick={() => dispatch(openAddBudget())}>
             <ArrowUpRight className="mr-1 h-4 w-4" /> Add Budget
           </Button>
           {budgetCollapse ? <ChevronRight onClick={toggleBudgetCollapse}/> : <ChevronDown onClick={toggleBudgetCollapse}/>}

@@ -37,6 +37,7 @@ import {
 } from "@/store/slices/uiSlice"
 import { filterExpenses } from '@/utils/helper'
 import {fetchExpenses} from "@/store/slices/dashboard/expensesSlice"
+import { fetchDashboard } from '../../utils/dashboardFetch'
 
 const ViewExpenseModel = () => {
   const dispatch = useDispatch()
@@ -54,6 +55,7 @@ const ViewExpenseModel = () => {
       if (res.status === 200) {
         dispatch(deleteExpenseAction(id))
         dispatch(closeViewExpense())
+        fetchDashboard(dispatch,{force:true})
 
         toast.success((t) => (
           <span className="flex items-center gap-2">
@@ -80,7 +82,7 @@ const ViewExpenseModel = () => {
       const res = await axios.put(`/api/expenses/restore-expenses/${id}`)
       if(res.status==200){
         dispatch(fetchExpenses({ page: 1 }))
-        toast.success("Restored successfully")
+        fetchDashboard(dispatch,{force:true})
         toast.success((t) => (
           <span className="flex items-center gap-2">
             Restoring from <b>Trash</b>
@@ -90,6 +92,27 @@ const ViewExpenseModel = () => {
 
     } catch (error) {
       toast.error("Failed to restore")
+    }
+  }
+
+  const handlePermanentDelete = async (id) => {
+    const toastId = toast.loading("Deleting Permanently...")
+
+    try {
+      const res = await axios.delete(`/api/expenses/delete-expenses/${id}`)
+      if (res.status === 200) {
+        dispatch(deleteExpenseAction(id))
+        dispatch(closeViewExpense())
+        fetchDashboard(dispatch,{force:true})
+        toast.success((t) => (
+          <span className="flex items-center gap-2">
+            Removed <b>Permanently</b>
+          </span>
+        ), { id: toastId, duration: 5000 })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Unable to delete expense", { id: toastId })
     }
   }
 
@@ -172,7 +195,16 @@ const ViewExpenseModel = () => {
                   Close
                 </Button>
               </SheetClose>
-              <Button
+              {
+                expense.trashed? ( <Button
+                variant="outline"
+                size="lg"
+                className="w-full text-green-500"
+                onClick={() => undoTrash(expense._id)}
+              >
+                Restore
+              </Button>):(
+                <Button
                 variant="outline"
                 size="lg"
                 className="w-full text-green-500"
@@ -180,14 +212,31 @@ const ViewExpenseModel = () => {
               >
                 Edit
               </Button>
-              <Button
+              )
+              }
+              
+              {
+                expense.trashed ? (
+                  <Button
+                variant="outline"
+                size="lg"
+                className="w-full text-red-500"
+                onClick={() => handlePermanentDelete(expense._id)}
+              >
+                Delete Forever
+              </Button>
+                ) : (
+                  <Button
                 variant="outline"
                 size="lg"
                 className="w-full text-red-500"
                 onClick={() => handleDeleteExpense(expense._id)}
               >
-                Delete
+                Trash
               </Button>
+                )
+              }
+              
             </div>
           </SheetFooter>
         </SheetContent>

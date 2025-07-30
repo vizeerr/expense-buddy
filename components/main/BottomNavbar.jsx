@@ -39,38 +39,38 @@ const BottomNavbar = () => {
       <div className='fixed bottom-2 z-3 w-full flex justify-center'>
 
         <div className='flex border-2 border-neutral-600 bg-transparent backdrop-blur-2xl h-full rounded-full px-4 py-1 drop-shadow-2xl drop-shadow-accent-foreground'>    
-          <Button asChild variant="ghost" size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
-            <Link href="/dashboard">
+          <Link href="/dashboard" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+           
               <House size={20} />
               <p className='text-[0.6rem] text-muted-foreground'>Home</p>
-            </Link>
-          </Button>
+        
+          </Link>
 
-          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
-            <Link href="/dashboard/groups">
-              <Users size={20} />
-              <p className='text-[0.6rem] text-muted-foreground'>Group</p>
-            </Link>
-          </Button>
-
-          <Button variant="ghost"  size="lg" className='flex pointer gap-0 p-0 flex-col justify-center items-center'>
-            
-              <CirclePlus  size={25} className='text-amber-500'/>
-            
-          </Button>
-          
-          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
-            <Link href="/dashboard/expenses">
+          <Link href="/dashboard/expenses" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+           
               <Wallet size={20} />
               <p className='text-[0.6rem] text-muted-foreground'>Expenses</p>
-            </Link>
-          </Button>
-          <Button asChild variant="ghost"  size="lg" className='flex pointer gap-0 flex-col justify-center items-center'>
-            <Link href="/dashboard/profile">
+          </Link>
+
+          <div className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+           
+              <CirclePlus  size={25} className='text-green-400'/>
+            
+          </div>
+
+          <Link href="/dashboard/groups" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+           
+              <Users size={20} />
+              <p className='text-[0.6rem] text-muted-foreground'>Groups</p>
+          </Link>
+
+        
+          <Link href="/dashboard/profile" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+           
               <UserRoundCog size={20} />
               <p className='text-[0.6rem] text-muted-foreground'>Profile</p>
-            </Link>
-          </Button>
+          </Link>
+
         </div>
             
       {/* <Menubar className=''>

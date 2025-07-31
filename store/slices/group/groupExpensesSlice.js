@@ -4,7 +4,7 @@ import axios from 'axios'
 // 🔄 Fetch group expenses with filters & pagination
 export const fetchGroupExpenses = createAsyncThunk(
   'groupExpenses/fetchGroupExpenses',
-  async ({ groupId, page = 1, limit = 10, search = '', type = '', category = '', paymentMethod = '', trashed = 'false', paidBy = '', addedBy = '' }, thunkAPI) => {
+  async ({ groupId, page = 1, limit = 10, search = '', type = '', category = '', paymentMethod = '', trashed = 'false', paidBy = '', addedBy = '',fromDate = '', toDate = '' }, thunkAPI) => {
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -15,6 +15,8 @@ export const fetchGroupExpenses = createAsyncThunk(
         ...(paymentMethod && { paymentMethod }),
         ...(paidBy && { paidBy }),
         ...(addedBy && { addedBy }),
+         ...(fromDate && { fromDate }),
+        ...(toDate && { toDate }),
         trashed: String(trashed),
       })
 
@@ -46,6 +48,8 @@ const groupExpensesSlice = createSlice({
       paidBy: '',
       addedBy: '', 
       trashed: 'false',
+      fromDate: '', // ✅ Added
+      toDate: '',   // ✅ Added
     },
   },
   reducers: {

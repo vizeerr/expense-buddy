@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSelector } from 'react-redux'
 
 const TopNavbar = () => {
-  const user = useSelector((state) => state.auth.user)
+  const user = useSelector((state) => state.auth.user) 
   return (
     <div className='py-3 px-4 flex justify-between items-center fixed top-0 w-full z-3 bg-[#0b000011] backdrop-blur-lg'>
       <div>

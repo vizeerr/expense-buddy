@@ -180,10 +180,10 @@ const ViewExpenseModel = () => {
                 <span className="font-medium">Date:</span>{' '}
                 {format(new Date(expense.datetime), 'dd MMM yyyy, hh:mm a')}
               </div>
-              <div className="sm:hidden flex items-center gap-2">
+              {/* <div className="sm:hidden flex items-center gap-2">
                 <Type className="w-4 h-4 text-gray-400" />
                 <span className="font-medium">Type:</span> {expense.type}
-              </div>
+              </div> */}
             </div>
           </div>
 

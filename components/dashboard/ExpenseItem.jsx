@@ -141,6 +141,7 @@ const ExpenseItem = ({ expense }) => {
       if(res.status==200){
         dispatch(setFilters({ search: '', type: '', category: '', trashed: "true" }))
         fetchDashboard(dispatch,{force:true})
+        toast.success("Restored successfully")
         toast.success((t) => (
           <span className="flex items-center gap-2">
             Restoring from <b>Trash</b>
@@ -177,14 +178,20 @@ const ExpenseItem = ({ expense }) => {
           <div className="flex-grow ml-4 ">
             <div className="flex flex-col ">
               <p className="text-base font-semibold capitalize">
-                {expense.title?.length > 18
-                  ? expense.title.slice(0, 18) + '...'
-                  : expense.title}
+                {expense.title
+                  ? expense.title.length > 18
+                    ? expense.title.slice(0, 18) + '...'
+                    : expense.title
+                  : 'No Title'}
+
               </p>
               <p className="text-sm text-neutral-400 capitalize">
-                {expense.description?.length > 25
-                  ? expense.description.slice(0, 25) + '..'
-                  : expense.description}
+                {expense.description
+                  ? expense.description.length > 25
+                    ? expense.description.slice(0, 25) + '..'
+                    : expense.description
+                  : 'No Description'}
+
               </p>
             </div>
             <p className="text-xs text-neutral-400">{formattedDate}</p>

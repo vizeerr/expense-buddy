@@ -24,6 +24,10 @@ export async function GET(req, { params }) {
     const trashed = searchParams.get('trashed') === 'true'
     const paidBy = searchParams.get('paidBy') || ''
     const addedBy = searchParams.get('addedBy') || ''
+    
+    const fromDate = searchParams.get('fromDate')
+    const toDate = searchParams.get('toDate')
+
 
     // 🧠 Build dynamic query
     const query = {
@@ -35,6 +39,7 @@ export async function GET(req, { params }) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
       ]
     }
 
@@ -43,6 +48,11 @@ export async function GET(req, { params }) {
     if (paymentMethod) query.paymentMethod = paymentMethod
     if (paidBy) query.paidBy = paidBy
     if (addedBy) query.addedBy = addedBy
+    if (fromDate || toDate) {
+      query.datetime = {}
+      if (fromDate) query.datetime.$gte = new Date(fromDate)
+      if (toDate) query.datetime.$lte = new Date(toDate)
+    }
 
     const skip = (page - 1) * limit
 
@@ -59,7 +69,6 @@ export async function GET(req, { params }) {
       success: true,
       expenses,
       pagination: {
-        total,
         page,
         limit,
         hasMore: skip + expenses.length < total,

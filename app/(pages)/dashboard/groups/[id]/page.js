@@ -27,7 +27,7 @@ const GroupDetailsPage = () => {
   // ✅ Show group content
   return (
     <>
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto pt-20 pb-16 space-y-6">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto pt-20 pb-20 space-y-6">
       
       <GroupHeader
         groupId = {groupId}

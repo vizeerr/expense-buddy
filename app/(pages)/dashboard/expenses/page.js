@@ -35,13 +35,13 @@ const ExpensesPage = () => {
   }, [dispatch, filters])
 
   return (
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-18 space-y-5 ">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-20 space-y-5 ">
       
        <ExpensesCard/>
       
       <div className='bg-transparent border   p-4 rounded-2xl'>
-        <div className='flex justify-between items-center pb-6'>
-          <h2 className="text-xl font-bold ">All Expenses</h2>
+        <div className='flex justify-between items-center '>
+          <h2 className="text-2xl font-bold ">All Expenses</h2>
           <Button size="sm" className=" bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600"  onClick={()=>dispatch(openAddExpense())}>
             <Plus/>
             Add Expense

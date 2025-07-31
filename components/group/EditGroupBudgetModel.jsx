@@ -68,7 +68,7 @@ const EditGroupBudgetModel = ({ groupId }) => {
       >
         <form onSubmit={handleSubmit}>
           <SheetHeader className="px-0 py-2">
-            <SheetTitle className="text-sm text-neutral-500">Update Monthly Budget</SheetTitle>
+            <SheetTitle className="text-sm text-neutral-500">Update Group Monthly Budget</SheetTitle>
           </SheetHeader>
 
           <div className="mt-5 grid gap-3">

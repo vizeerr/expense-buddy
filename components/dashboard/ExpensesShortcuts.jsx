@@ -11,11 +11,11 @@ import ExpenseItem from './ExpenseItem' // ✅ import here
 import { fetchExpenses } from '@/store/slices/dashboard/expensesSlice'
 
 const ExpensesShortcuts = () => {
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
   const { list: expenses, loading, error } = useSelector((state) => state.expenses)
-  useEffect(() => {
-    dispatch(fetchExpenses({ page: 1 }))
-  }, [dispatch])
+  // useEffect(() => {
+  //   dispatch(fetchExpenses({ page: 1 }))
+  // }, [dispatch])
   
   const visibleExpenses = expenses.slice(0, 5)
 

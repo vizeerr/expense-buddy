@@ -13,17 +13,17 @@ import { fetchGroupExpenses } from '@/store/slices/group/groupExpensesSlice'
 const GroupExpenseShortcuts = ({groupId}) => {
   const dispatch = useDispatch()
     const { list: expenses, loading, error } = useSelector((state) => state.groupExpenses)
-    useEffect(() => {
-      dispatch(fetchGroupExpenses({ page: 1, groupId }))
-    }, [dispatch])
+    // useEffect(() => {
+    //   dispatch(fetchGroupExpenses({ page: 1, groupId }))
+    // }, [dispatch])
     
     const visibleExpenses = expenses.slice(0, 5)
 
   return (
      <>
-      <div className="border p-6 xl:rounded-3xl rounded-2xl bg-neutral-900">
+      <div className="border p-4  xl:rounded-2xl rounded-2xl bg-transparent">
         <div className="flex gap-2 items-center">
-          <ShoppingBag className="w-6" />
+          <ShoppingBag size={18} />
           <p className="text-xl font-bold">Recent Transactions</p>
         </div>
 
@@ -40,9 +40,9 @@ const GroupExpenseShortcuts = ({groupId}) => {
             <p className="text-xs font-bold text-neutral-500">Today</p>
           </div>
 
-          <hr className="my-4" />
+          {/* <hr className="my-4" /> */}
 
-          <div className="space-y-4">
+          <div className="pace-y-4 mt-4">
             {loading ? (
               Array(3)
                 .fill(0)
@@ -58,9 +58,9 @@ const GroupExpenseShortcuts = ({groupId}) => {
             {error && <p className="text-red-500 text-sm">Error: {error}</p>}
           </div>
 
-          <div className="w-full flex justify-center mt-5">
-            <Button asChild>
-              <Link href={`/dashboard/groups/${groupId}/expenses/`}>View All</Link>
+          <div className="w-full flex justify-center mt-4">
+             <Button size="sm" variant="ghost" asChild className='bg-transparent  text-neutral-400 drop-shadow-2xl drop-shadow-accent-foreground xl:hover:text-white'>
+               <Link href={`/dashboard/groups/${groupId}/expenses/`}>View All</Link>
             </Button>
           </div>
         </div>

@@ -38,18 +38,18 @@ const BottomNavbar = () => {
     {user &&
       <div className='fixed bottom-2 z-3 w-full flex justify-center'>
 
-        <div className='flex border-2 border-neutral-600 bg-transparent backdrop-blur-2xl h-full rounded-full px-4 py-1 drop-shadow-2xl drop-shadow-accent-foreground'>    
+        <div className='flex items-center justify-between border-2 w-[95vw] max-w-sm border-neutral-600 bg-transparent backdrop-blur-2xl h-full rounded-full px-4 py-1.5 drop-shadow-2xl drop-shadow-accent-foreground'>    
           <Link href="/dashboard" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
-              <House size={20} />
-              <p className='text-[0.6rem] text-muted-foreground'>Home</p>
+              <House size={25} />
+              <p className='text-xs text-muted-foreground'>Home</p>
         
           </Link>
 
           <Link href="/dashboard/expenses" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
-              <Wallet size={20} />
-              <p className='text-[0.6rem] text-muted-foreground'>Expenses</p>
+              <Wallet size={25} />
+              <p className='text-xs text-muted-foreground'>Expenses</p>
           </Link>
 
           <div className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
@@ -60,15 +60,15 @@ const BottomNavbar = () => {
 
           <Link href="/dashboard/groups" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
-              <Users size={20} />
-              <p className='text-[0.6rem] text-muted-foreground'>Groups</p>
+              <Users size={25} />
+              <p className='text-xs text-muted-foreground'>Groups</p>
           </Link>
 
         
           <Link href="/dashboard/profile" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
-              <UserRoundCog size={20} />
-              <p className='text-[0.6rem] text-muted-foreground'>Profile</p>
+              <UserRoundCog size={25} />
+              <p className='text-xs text-muted-foreground'>Profile</p>
           </Link>
 
         </div>
@@ -82,7 +82,7 @@ const BottomNavbar = () => {
             <MenubarTrigger className='flex flex-col'>
               <Users size={19} />
             
-              <p className='text-[0.6rem] text-muted-foreground'>Groups</p>
+              <p className='text-xs text-muted-foreground'>Groups</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -126,7 +126,7 @@ const BottomNavbar = () => {
             <MenubarTrigger className='flex flex-col'>
               <Wallet size={19} />
             
-              <p className='text-[0.6rem] text-muted-foreground'>All Expenses</p>
+              <p className='text-xs text-muted-foreground'>All Expenses</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>
@@ -146,7 +146,7 @@ const BottomNavbar = () => {
             <MenubarTrigger className='flex flex-col '>
               <UserRoundCog size={19} />
             
-              <p className='text-[0.6rem] text-muted-foreground'>Profile</p>
+              <p className='text-xs text-muted-foreground'>Profile</p>
             </MenubarTrigger>
             <MenubarContent>
             <MenubarItem>

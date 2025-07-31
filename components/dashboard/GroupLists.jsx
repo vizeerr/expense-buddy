@@ -32,9 +32,9 @@ const GroupLists = () => {
     const router = useRouter()
   const { list: groups, loading } = useSelector((state) => state.groups)
 
-  useEffect(() => {
-    dispatch(fetchGroups())
-  }, [dispatch])
+  // useEffect(() => {
+  //   dispatch(fetchGroups())
+  // }, [dispatch])
 
  
  

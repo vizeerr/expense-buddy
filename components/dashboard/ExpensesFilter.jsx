@@ -46,24 +46,37 @@ const ExpenseFilters = () => {
     }))
     setOpen(false)
   }
+  
+const clearFilters = () => {
+  const defaultFilters = {
+    type: '',
+    category: '',
+    trashed: 'false',
+    paymentMethod: '',
+    fromDate: '',
+    toDate: ''
+  }
 
-  const clearFilters = () => {
-    setType('')
-    setCategory('')
-    setTrashed('false')
-    setPaymentMethod('')
-    setFromDate(null)
-    setToDate(null)
+  const hasChanges = Object.entries(defaultFilters).some(
+    ([key, value]) => filters[key] !== value
+  )
+
+  setType('')
+  setCategory('')
+  setTrashed('false')
+  setPaymentMethod('')
+  setFromDate(null)
+  setToDate(null)
+
+  if (hasChanges) {
     dispatch(setFilters({
       ...filters,
-      type: '',
-      category: '',
-      trashed: 'false',
-      paymentMethod: '',
-      fromDate: '',
-      toDate: '',
+      ...defaultFilters,
     }))
   }
+    setOpen(false)
+  
+}
 
   const renderDatePicker = (label, date, setDate) => (
     <Popover>
@@ -98,9 +111,9 @@ const ExpenseFilters = () => {
   }
 
   return (
-    <div className='flex items-center mb-4 gap-0'>
+    <div className='flex items-center mt-6 mb-4 gap-2'>
       {/* 🔍 Search Input */}
-      <div className="w-xs flex items-center gap-2 ">
+      <div className="w-full flex items-center ">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -115,14 +128,14 @@ const ExpenseFilters = () => {
       {/* Filters Button */}
       <div className=" flex justify-end ">
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="icon" className="flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4" />
+          <PopoverTrigger>
+              <SlidersHorizontal size={18}/>
+            {/* <Button variant="icon" size={"lg"} className="flex items-center gap-2">
               
-            </Button>
+            </Button> */}
           </PopoverTrigger>
 
-          <PopoverContent className="w-[82vw] sm:w-[600px] p-4 rounded-xl shadow-md bg-transparent backdrop-blur-xl" align="end">
+          <PopoverContent className="w-[90vw] sm:w-[600px] p-4 rounded-xl shadow-md bg-transparent backdrop-blur-xl" align="end">
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger className="w-full">

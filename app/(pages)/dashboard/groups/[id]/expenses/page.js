@@ -61,13 +61,13 @@ useEffect(() => {
   }, [dispatch, filters,groupId])
 
   return (
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-16 space-y-6 ">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-20 space-y-5 ">
       <GroupExpenseCard/>
       
-      <div className='bg-neutral-900 p-6 rounded-2xl border'>
-        <div className='flex justify-between items-center pb-6'>
-          <h2 className="text-2xl font-bold mb-4">All Group Expenses</h2>
-          <Button onClick={()=>dispatch(openAddGroupExpense())}>
+      <div className='bg-transparent border   p-4 rounded-2xl'>
+        <div className='flex justify-between items-center '>
+          <h2 className="text-2xl font-bold ">All Expenses</h2>
+          <Button size="sm" className=" bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600"  onClick={()=>dispatch(openAddGroupExpense())}>
             <Plus/>
             Add Expense
           </Button>

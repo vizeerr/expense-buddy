@@ -20,8 +20,8 @@ const GroupsPage = () => {
     <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-16 space-y-6 ">
       <div className='bg-transparent p-4 rounded-2xl border'>
         <div className='flex justify-between items-center pb-6'>
-          <h2 className="text-2xl font-bold ">Your Groups</h2>
-          <Button  className ="bg-transparent border border-green-500 text-green-500 drop-shadow-xl drop-shadow-green-600" onClick={()=>dispatch(openAddGroup())}>
+          <h2 className="text-2xl font-bold ">Joined Groups</h2>
+          <Button  size="sm" className ="bg-transparent border border-green-500 text-green-500 drop-shadow-xl drop-shadow-green-600" onClick={()=>dispatch(openAddGroup())}>
             <Plus/>
             Create Group
           </Button>

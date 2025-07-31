@@ -12,13 +12,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { X } from 'lucide-react'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
+import { Search, X,SlidersHorizontal,Calendar as CalendarIcon } from 'lucide-react'
 import {fetchGroups} from "@/store/slices/group/groupSlice"
 
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 const GroupExpenseFilters = ({groupMembers}) => {
   const dispatch = useDispatch()
   const { filters } = useSelector((state) => state.groupExpenses)
-
+  const [open, setOpen] = useState(false)
   const [search, setSearch] = useState(filters.search || '')
   const [type, setType] = useState(filters.type || '')
   const [category, setCategory] = useState(filters.category || '')
@@ -26,15 +30,39 @@ const GroupExpenseFilters = ({groupMembers}) => {
   const [paymentMethod, setPaymentMethod] = useState(filters.paymentMethod || '')
   const [paidBy, setPaidBy] = useState(filters.paidBy || '')
   const [addedBy, setAddedBy] = useState(filters.addedBy || '')
+  
+    const [fromDate, setFromDate] = useState(filters.fromDate ? new Date(filters.fromDate) : null)
+    const [toDate, setToDate] = useState(filters.toDate ? new Date(filters.toDate) : null)
 
-  useEffect(() => {
-    const debounce = setTimeout(() => {
-      dispatch(setGroupExpenseFilters({ search, type, category, trashed, paymentMethod, paidBy, addedBy }))
-    }, 300)
-    return () => clearTimeout(debounce)
-  }, [search, type, category, trashed, paymentMethod, paidBy, addedBy, dispatch])
-
+ const applyFilters = () => {
+    dispatch(setGroupExpenseFilters({
+      search,
+      type,
+      category,
+      trashed,
+      paymentMethod,
+      paidBy, addedBy,
+      fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
+      toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
+    }))
+    setOpen(false)
+  }
   const clearFilters = () => {
+    const defaultFilters = {
+      type: '',
+      category: '',
+      trashed: 'false',
+      paymentMethod: '',
+      fromDate: '',
+      toDate: '',
+      paidBy: '',
+      addedBy: ''
+    }
+  
+    const hasChanges = Object.entries(defaultFilters).some(
+      ([key, value]) => filters[key] !== value
+    )
+  
     setSearch('')
     setType('')
     setCategory('')
@@ -42,117 +70,174 @@ const GroupExpenseFilters = ({groupMembers}) => {
     setPaymentMethod('')
     setPaidBy('')
     setAddedBy('')
-    dispatch(setGroupExpenseFilters({
-      search: '',
-      type: '',
-      category: '',
-      trashed: 'false',
-      paymentMethod: '',
-      paidBy: '',
-      addedBy: ''
-    }))
+    setFromDate(null)
+    setToDate(null)
+  
+    if (hasChanges) {
+      dispatch(setGroupExpenseFilters({
+        ...filters,
+        ...defaultFilters,
+      }))
+    }
+      setOpen(false)
+    
   }
+  
+   const handleSearch = (e) => {
+      const value = e.target.value
+      setSearch(value)
+      dispatch(setGroupExpenseFilters({ ...filters, search: value }))
+    }
+  
   useEffect(()=>{
     dispatch(fetchGroups)
   })
+   const renderDatePicker = (label, date, setDate) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            'w-full justify-start text-left font-normal',
+            !date && 'text-muted-foreground'
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, 'dd MMM yyyy') : label}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-end flex-wrap gap-4 mb-6">
-      <Input
-        placeholder="Search group expense..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="flex-1 min-w-[200px]"
-      />
+     <div className='flex items-center mt-6 mb-4 gap-2'>
+      {/* 🔍 Search Input */}
+      <div className="w-full flex items-center ">
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Input
+            placeholder="Search title or description..."
+            value={search}
+            onChange={handleSearch}
+            className="pl-9"
+          />
+        </div>
+      </div>
 
-      <Select value={type} onValueChange={setType}>
-        <SelectTrigger className="w-full lg:w-[160px]">
-          <SelectValue placeholder="Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="credit">Credit</SelectItem>
-          <SelectItem value="debit">Debit</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Filters Button */}
+      <div className=" flex justify-end ">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger>
+              <SlidersHorizontal size={18}/>
+            {/* <Button variant="icon" size={"lg"} className="flex items-center gap-2">
+              
+            </Button> */}
+          </PopoverTrigger>
 
-      <Select value={category} onValueChange={setCategory}>
-        <SelectTrigger className="w-full lg:w-[160px]">
-          <SelectValue placeholder="Category" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="food">Food</SelectItem>
-          <SelectItem value="travel">Travel</SelectItem>
-          <SelectItem value="shopping">Shopping</SelectItem>
-          <SelectItem value="salary">Salary</SelectItem>
-          <SelectItem value="education">Education</SelectItem>
-          <SelectItem value="entertainment">Entertainment</SelectItem>
-          <SelectItem value="health">Health</SelectItem>
-          <SelectItem value="others">Others</SelectItem>
-        </SelectContent>
-      </Select>
+          <PopoverContent className="w-[90vw] sm:w-[600px] p-4 rounded-xl shadow-md bg-transparent backdrop-blur-xl" align="end">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="credit">Credit</SelectItem>
+                  <SelectItem value="debit">Debit</SelectItem>
+                </SelectContent>
+              </Select>
 
-      <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-        <SelectTrigger className="w-full lg:w-[160px]">
-          <SelectValue placeholder="Payment Method" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="upi">UPI</SelectItem>
-          <SelectItem value="cash">Cash</SelectItem>
-          <SelectItem value="card">Card</SelectItem>
-          <SelectItem value="netbanking">Net Banking</SelectItem>
-          <SelectItem value="other">Other</SelectItem>
-        </SelectContent>
-      </Select>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="food">Food</SelectItem>
+                  <SelectItem value="travel">Travel</SelectItem>
+                  <SelectItem value="shopping">Shopping</SelectItem>
+                  <SelectItem value="salary">Salary</SelectItem>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="health">Health</SelectItem>
+                  <SelectItem value="others">Others</SelectItem>
+                </SelectContent>
+              </Select>
 
-      <Select value={paidBy} onValueChange={setPaidBy}>
-        <SelectTrigger className="w-full lg:w-[160px] capitalize">
-          <SelectValue placeholder="Paid By" />
-        </SelectTrigger>
-        <SelectContent>
+              {renderDatePicker('From Date', fromDate, setFromDate)}
+              {renderDatePicker('To Date', toDate, setToDate)}
 
-           {groupMembers
-            .filter(member => member && member._id && member.name)
-            .map(member => (
-                <SelectItem  className="capitalize" key={member._id} value={member._id}>
-                {member.name}
-                </SelectItem>
-            ))}
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Payment Method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="upi">UPI</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                  <SelectItem value="netbanking">Net Banking</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+             
 
-        </SelectContent>
-      </Select>
+              <Select value={trashed} onValueChange={setTrashed}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Active</SelectItem>
+                  <SelectItem value="true">Trashed</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={paidBy} onValueChange={setPaidBy}>
+                      <SelectTrigger className="w-full lg:w-[160px] capitalize">
+                        <SelectValue placeholder="Paid By" />
+                      </SelectTrigger>
+                      <SelectContent>
 
-      <Select value={addedBy} onValueChange={setAddedBy}>
-        <SelectTrigger className="w-full lg:w-[160px] capitalize">
-          <SelectValue placeholder="Created By" />
-        </SelectTrigger>
-        <SelectContent>
-          {groupMembers
-            .filter(member => member && member._id && member.name)
-            .map(member => (
-                <SelectItem  className="capitalize" key={member._id} value={member._id}>
-                {member.name}
-                </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
+                        {groupMembers
+                          .filter(member => member && member._id && member.name)
+                          .map(member => (
+                              <SelectItem  className="capitalize" key={member._id} value={member._id}>
+                              {member.name}
+                              </SelectItem>
+                          ))}
 
-      <Select value={trashed} onValueChange={setTrashed}>
-        <SelectTrigger className="w-full lg:w-[160px]">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="false">Active</SelectItem>
-          <SelectItem value="true">Trashed</SelectItem>
-        </SelectContent>
-      </Select>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={addedBy} onValueChange={setAddedBy}>
+                      <SelectTrigger className="w-full lg:w-[160px] capitalize">
+                        <SelectValue placeholder="Created By" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groupMembers
+                          .filter(member => member && member._id && member.name)
+                          .map(member => (
+                              <SelectItem  className="capitalize" key={member._id} value={member._id}>
+                              {member.name}
+                              </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+            </div>
 
-      <Button
-        onClick={clearFilters}
-        variant="outline"
-        className="flex gap-1 items-center text-red-500"
-      >
-        <X className="w-4 h-4" /> Clear
-      </Button>
+            <div className="mt-4 flex justify-between items-center">
+              <Button variant="outline" onClick={clearFilters} className="text-red-500 gap-1">
+                <X className="w-4 h-4" /> Clear
+              </Button>
+              <Button onClick={applyFilters}>Done</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   )
 }

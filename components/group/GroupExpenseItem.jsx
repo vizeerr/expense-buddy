@@ -261,7 +261,7 @@ const GroupExpenseItem = ({ expense }) => {
          
         </div>
       {/* member  */}
-      <div className='flex  gap-2'>
+      <div className='flex sm:hidden  gap-2'>
               <div className="flex items-center gap-1 bg-neutral-900 px-2 py-1 rounded-full text-green-500 text-[0.6rem]">
                 <UserRound className="w-2.5 h-2.5" />
                 <span className="font-medium text-[0.6rem]">Paid By:</span>
@@ -282,11 +282,28 @@ const GroupExpenseItem = ({ expense }) => {
       <div className="flex flex-row items-center justify-between w-full gap-2">
         
        <div className='flex gap-2.5 items-center'>
+        
           
         
         <div className="px-3 py-1 rounded-full border border-neutral-600 text-[0.6rem] capitalize font-semibold">
           {expense.category}
         </div>
+        <div className=' gap-2 sm:flex hidden'>
+              <div className="flex items-center gap-1 bg-neutral-900 px-2 py-1 rounded-full text-green-500 text-[0.6rem]">
+                <UserRound className="w-2.5 h-2.5" />
+                <span className="font-medium text-[0.6rem]">Paid By:</span>
+                <span className="text-white capitalize text-[0.6rem]">{expense.paidBy?.name || 'Unknown'}</span>
+              </div>
+              {
+                expense.paidBy?.email !== expense.addedBy?.email &&
+              <div className="flex items-center gap-1 bg-neutral-900 px-2 py-1 rounded-full text-amber-400 text-[0.6rem]">
+                <UserRound className="w-2.5 h-2.5" />
+                <span className="font-medium text-[0.6rem]">Created By:</span>
+                <span className="text-white capitalize text-[0.6rem]">{expense.addedBy?.name || 'Unknown'}</span>
+              </div>
+              }
+        </div>
+
        </div>
         
 

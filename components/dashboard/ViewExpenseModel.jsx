@@ -123,10 +123,10 @@ const ViewExpenseModel = () => {
       <Sheet open={viewExpense.open} onOpenChange={() => dispatch(closeViewExpense())}>
         <SheetContent
           side="bottom"
-          className="w-[95vw] max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+          className="w-[95vw] max-w-3xl mx-auto p-4  rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
         >
           
-          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-0 '>
             <SheetClose asChild>
               <Button variant="ghost" size="icon" type="button">
                 <ArrowLeft className="w-5 h-5" />
@@ -188,7 +188,7 @@ const ViewExpenseModel = () => {
           </div>
 
           {/* Footer Buttons */}
-          <SheetFooter className="p-0 mt-5">
+          <SheetFooter className="p-0 mt-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
               <SheetClose asChild>
                 <Button variant="outline" size="lg" className="w-full text-white">

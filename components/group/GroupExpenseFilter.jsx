@@ -33,21 +33,6 @@ const GroupExpenseFilters = ({groupMembers}) => {
   
     const [fromDate, setFromDate] = useState(filters.fromDate ? new Date(filters.fromDate) : null)
     const [toDate, setToDate] = useState(filters.toDate ? new Date(filters.toDate) : null)
-
- const applyFilters = () => {
-    dispatch(setGroupExpenseFilters({
-      search,
-      type,
-      category,
-      trashed,
-      paymentMethod,
-      paidBy, addedBy,
-      fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
-      toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
-    }))
-    setOpen(false)
-  }
-  const clearFilters = () => {
     const defaultFilters = {
       type: '',
       category: '',
@@ -59,6 +44,27 @@ const GroupExpenseFilters = ({groupMembers}) => {
       addedBy: ''
     }
   
+
+ const applyFilters = () => {
+   const hasChanges = Object.entries(defaultFilters).some(
+      ([key, value]) => filters[key] !== value
+    )
+    if (hasChanges) {
+      dispatch(setGroupExpenseFilters({
+        search,
+        type,
+        category,
+        trashed,
+        paymentMethod,
+        paidBy, addedBy,
+        fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
+        toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
+      }))
+    }
+    setOpen(false)
+  }
+  const clearFilters = () => {
+    
     const hasChanges = Object.entries(defaultFilters).some(
       ([key, value]) => filters[key] !== value
     )

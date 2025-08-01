@@ -144,13 +144,13 @@ const AddExpenseModel = () => {
     <Sheet open={isOpen} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-3xl max-h-[95vh] sm:h-auto h-[90vh] mx-auto p-6 rounded-3xl backdrop-blur-lg bg-transparent border-2 md:mb-10 mb-4"
+        className="w-[95vw] max-w-3xl max-h-[95vh] sm:h-auto h-[90vh] mx-auto p-4 rounded-3xl backdrop-blur-lg bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit} className="flex flex-col h-full" >
           <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
             <SheetClose asChild>
               <Button variant="ghost" size="icon" type="button">
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft  className="w-5 h-5" />
               </Button>
             </SheetClose>
             <SheetTitle className='text-sm text-neutral-500 font-bold'>Add New Expense</SheetTitle>

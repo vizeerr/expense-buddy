@@ -36,6 +36,7 @@ import {
 
 import { filterExpenses } from '@/utils/helper'
 import {fetchGroupExpenses} from "@/store/slices/group/groupExpensesSlice"
+import { getColorConfigFromString } from "../../utils/colorPalette"
 
 const ViewGroupExpenseModel = () => {
   const dispatch = useDispatch()
@@ -153,19 +154,45 @@ const ViewGroupExpenseModel = () => {
               </div>
               <div className="flex items-center gap-2 capitalize">
                 <UserRound className="w-4 h-4 text-green-500" />
-                <span className="font-medium">Paid By:</span> {expense.paidBy.name || 'N/A'}
+                <span className="font-medium">Paid By:</span> {expense.paidBy.name  || 'N/A'} 
+                <span className="text-xs text-muted-foreground lowercase">({(expense.paidBy.email )})</span>
               </div>
               <div className="flex items-center gap-2 capitalize">
                 <UserRound className="w-4 h-4 text-amber-500" />
-                <span className="font-medium">Created By:</span> {expense.paidBy.name || 'N/A'}
+                <span className="font-medium">Created By:</span> {expense.addedBy.name || 'N/A'}
+                <span className="text-xs text-muted-foreground lowercase">({(expense.addedBy.email )})</span>
+
               </div>
+              
+
 
               
-              <div className="sm:hidden flex items-center gap-2">
-                <Type className="w-4 h-4 text-gray-400" />
-                <span className="font-medium">Type:</span> {expense.type}
-              </div>
+              
             </div>
+           <div className="mt-4 flex items-center gap-2 capitalize flex-wrap">
+  <UserRound className="w-4 h-4 text-amber-500" />
+  <span className="font-medium">Split Between:</span>
+
+  <div className="flex gap-2 flex-wrap">
+    {Array.isArray(expense.splitBetween) && expense.splitBetween.length > 0 ? (
+      expense.splitBetween.map((user, index) => {
+        const color = getColorConfigFromString(user.email || user.name || 'user');
+        return (
+          <span
+            key={user._id || index}
+            className={`${color.border} border rounded-2xl px-3 py-2 text-xs`}
+          >
+            {user.name}
+            <span className="text-muted-foreground lowercase"> ({user.email})</span>
+          </span>
+        );
+      })
+    ) : (
+      <span className="text-xs text-muted-foreground">N/A</span>
+    )}
+  </div>
+</div>
+
           </div>
 
           {/* Footer Buttons */}

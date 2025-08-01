@@ -34,21 +34,7 @@ const ExpenseFilters = () => {
   const [fromDate, setFromDate] = useState(filters.fromDate ? new Date(filters.fromDate) : null)
   const [toDate, setToDate] = useState(filters.toDate ? new Date(filters.toDate) : null)
 
-  const applyFilters = () => {
-    dispatch(setFilters({
-      search,
-      type,
-      category,
-      trashed,
-      paymentMethod,
-      fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
-      toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
-    }))
-    setOpen(false)
-  }
-  
-const clearFilters = () => {
-  const defaultFilters = {
+   const defaultFilters = {
     type: '',
     category: '',
     trashed: 'false',
@@ -57,6 +43,26 @@ const clearFilters = () => {
     toDate: ''
   }
 
+  const applyFilters = () => {
+    const hasChanges = Object.entries(defaultFilters).some(
+    ([key, value]) => filters[key] !== value
+    )
+    if (hasChanges) {
+      dispatch(setFilters({
+        search,
+        type,
+        category,
+        trashed,
+        paymentMethod,
+        fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
+        toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
+      }))
+    }
+    setOpen(false)
+  }
+  
+const clearFilters = () => {
+ 
   const hasChanges = Object.entries(defaultFilters).some(
     ([key, value]) => filters[key] !== value
   )
@@ -74,7 +80,7 @@ const clearFilters = () => {
       ...defaultFilters,
     }))
   }
-    setOpen(false)
+  setOpen(false)
   
 }
 

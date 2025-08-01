@@ -61,7 +61,7 @@ useEffect(() => {
   }, [dispatch, filters,groupId])
 
   return (
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-20 space-y-5 ">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-16 pb-20 space-y-5 ">
       <GroupExpenseCard/>
       
       <div className='bg-transparent border   p-4 rounded-2xl'>
@@ -87,7 +87,7 @@ useEffect(() => {
         ))}
 
         {loading && (
-          Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-[120px] w-full rounded-xl" />)
+          Array(3).fill(0).map((_, i) => <Skeleton key={i} className="sm:h-[120px] h-[140px] w-full rounded-xl" />)
         )}
       </div>
 

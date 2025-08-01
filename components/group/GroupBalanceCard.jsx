@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Wallet, HandCoins, TrendingUp, ArrowUpRight, ArrowDown, PiggyBank, Activity,
   Coins, BarChart as BarChartIcon, LineChart as LineChartIcon, FileBarChart,
@@ -8,7 +8,7 @@ import {
   ChevronRight,
   ChevronDown
 } from "lucide-react"
-
+import { cn } from '@/lib/utils'
 import {
   LineChart as ReLineChart, BarChart as ReBarChart, AreaChart as ReAreaChart,
   XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Line, Bar, Area
@@ -66,6 +66,23 @@ const GroupBalanceCard = ({id}) => {
   const [budgetCollapse, toggleBudgetCollapse] = useLocalCollapse('group-budget-card') || "false"
   const [analyticCollapse, toggleAnalyticCollapse] = useLocalCollapse('group-analytic-card') || "false"
   
+   const [api, setApi] = useState()
+    const [current, setCurrent] = useState(0)
+    const [count, setCount] = useState(0)
+  
+    useEffect(() => {
+      if (!api) {
+        return
+      }
+   
+      setCount(api.scrollSnapList().length)
+      setCurrent(api.selectedScrollSnap() + 1)
+   
+      api.on("select", () => {
+        setCurrent(api.selectedScrollSnap() + 1)
+      })
+    }, [api])
+  
 
   useEffect(() => {
     if (!id) return
@@ -89,7 +106,7 @@ const GroupBalanceCard = ({id}) => {
 }, [summary])
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 md:gap-4 gap-5 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5 items-start">
       
       {/* --- Group Accounts --- */}
       <Card className="drop-shadow-2xl bg-transparent drop-shadow-green-950 py-4">
@@ -298,7 +315,7 @@ const GroupBalanceCard = ({id}) => {
           >
                 
               <CardContent className="px-4">
-                <Carousel className="sm:w-[90%] lg:w-[85%] 2xl:w-full w-[77%] mx-auto">
+                <Carousel setApi={setApi} className="w-full mx-auto">
                   <CarouselContent>
       
                     <CarouselItem className=" md:basis-1/2 lg:basis-full 2xl:basis-1/4">
@@ -352,8 +369,26 @@ const GroupBalanceCard = ({id}) => {
                     </ChartCard>
                     </CarouselItem>
                   </CarouselContent>
-                  <CarouselPrevious className="2xl:hidden"/>
-                          <CarouselNext className="2xl:hidden" />
+                   {count>1 && (
+                      <div className="mt-4 flex justify-center flex-wrap gap-1">
+                        {Array.from({ length: count }).map((_, index) => (
+                          <button
+                            key={index+1}
+                            className={cn(
+                              'w-3 h-1 rounded-full transition-all',
+                              current === index+1
+                                ? 'bg-primary'
+                                : 'bg-muted-foreground/40 hover:bg-muted-foreground/70'
+                            )}
+                            onClick={() => api?.scrollTo(index)}
+                            aria-label={`Go to slide ${index + 1}`}
+                            
+                          />
+                        ))}
+                        
+                      </div>
+                      )}
+
                 </Carousel>
               </CardContent>
                </motion.div>
@@ -413,7 +448,7 @@ const GroupBalanceCard = ({id}) => {
                   </ResponsiveContainer>
                 </ChartCard>
               </CardContent>
-                </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
           

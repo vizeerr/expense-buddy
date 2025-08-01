@@ -17,7 +17,7 @@ const GroupsPage = () => {
 
   return (
     <>
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-16 space-y-6 ">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-16 pb-20 space-y-5 ">
       <div className='bg-transparent p-4 rounded-2xl border'>
         <div className='flex justify-between items-center pb-6'>
           <h2 className="text-2xl font-bold ">Joined Groups</h2>

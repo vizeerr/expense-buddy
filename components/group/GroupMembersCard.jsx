@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchGroupMemberSummary } from '@/store/slices/group/memberSummarySlice'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,6 +21,22 @@ function getInitials(name = '') {
 export default function GroupMemberCard({ groupId }) {
   const dispatch = useDispatch()
   const { members, loading, error } = useSelector((state) => state.groupMember)
+  const [api, setApi] = useState()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!api) {
+      return
+    }
+ 
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap() + 1)
+ 
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1)
+    })
+  }, [api])
 
   useEffect(() => {
     if (groupId) dispatch(fetchGroupMemberSummary(groupId))
@@ -28,10 +44,16 @@ export default function GroupMemberCard({ groupId }) {
 
   if (loading) {
     return (
-      <div className="flex gap-4 flex-wrap">
-        {[...Array(2)].map((_, i) => (
+      <div className="border p-4 xl:rounded-2xl rounded-xl bg-transparent">
+      <div className="flex gap-2 items-center mb-5">
+        <UserRound size={18} />
+        <p className="text-xl font-bold">Users Expenses</p>
+      </div>
+      <div className="flex gap-4 ">
+        {[...Array(1)].map((_, i) => (
           <Skeleton key={i} className="h-44 w-80 rounded-xl" />
         ))}
+      </div>
       </div>
     )
   }
@@ -41,16 +63,17 @@ export default function GroupMemberCard({ groupId }) {
   }
 
   return (
-    <div className="border p-6 xl:rounded-2xl rounded-xl bg-transparent">
-      <div className="flex gap-2 items-center mb-4">
+    <div className="border p-4 xl:rounded-2xl rounded-xl bg-transparent">
+      <div className="flex gap-2 items-center mb-5">
         <UserRound size={18} />
         <p className="text-xl font-bold">Users Expenses</p>
       </div>
 
       {/* Carousel */}
-      <Carousel
+      <Carousel 
+      setApi={setApi}
         opts={{ align: 'start', loop: false }}
-        className="sm:w-[90%]  2xl:w-[95%] w-[80%] mx-auto"
+        className="w-[100%] mx-auto"
       >
         <CarouselContent className="">
           {members.map((member, index) => {
@@ -103,8 +126,29 @@ export default function GroupMemberCard({ groupId }) {
             )
           })}
         </CarouselContent>
-          <CarouselPrevious/>
-          <CarouselNext />
+        
+        {count>1 && (
+
+        
+         <div className="mt-4 flex justify-center flex-wrap gap-1">
+          {Array.from({ length: count }).map((_, index) => (
+            <button
+              key={index+1}
+              className={cn(
+                'w-3 h-1 rounded-full transition-all',
+                current === index+1
+                  ? 'bg-primary'
+                  : 'bg-muted-foreground/40 hover:bg-muted-foreground/70'
+              )}
+               onClick={() => api?.scrollTo(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              
+            />
+          ))}
+          
+        </div>
+        )}
+
       </Carousel>
     </div>
   )

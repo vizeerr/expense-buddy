@@ -42,7 +42,7 @@ const GroupExpenseShortcuts = ({groupId}) => {
 
           {/* <hr className="my-4" /> */}
 
-          <div className="pace-y-4 mt-4">
+          <div className="space-y-4 mt-4">
             {loading ? (
               Array(3)
                 .fill(0)

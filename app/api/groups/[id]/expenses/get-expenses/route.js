@@ -62,6 +62,8 @@ export async function GET(req, { params }) {
       .limit(limit)
       .populate('addedBy', 'name email')
       .populate('paidBy', 'name email')
+      .populate('splitBetween', 'name email')
+
 
     const total = await GroupExpense.countDocuments(query)
 

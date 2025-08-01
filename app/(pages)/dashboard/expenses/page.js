@@ -35,7 +35,7 @@ const ExpensesPage = () => {
   }, [dispatch, filters])
 
   return (
-    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-20 pb-20 space-y-5 ">
+    <div className="xl:w-[80vw] md:w-[90vw] w-[95vw] mx-auto  pt-16 pb-20 space-y-5 ">
       
        <ExpensesCard/>
       

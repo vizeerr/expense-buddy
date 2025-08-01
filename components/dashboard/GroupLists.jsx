@@ -69,15 +69,15 @@ const GroupLists = () => {
           </Button>
       </div>
         <hr className='mt-5'/>
-        {loading && (!groups || groups.length === 0) && <div className="text-muted-foreground text-center py-8">
+        {(!groups || groups.length === 0) && <div className="text-muted-foreground text-center py-8">
         You are not part of any groups yet or create a new group.
       </div>}
-        {loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+        {groups && loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
         {[...Array(1)].map((_, i) => (
           <Skeleton key={i} className="h-20 w-full rounded-lg" />
         ))}
       </div>}
-        <Carousel setApi={setApi} className="w-full mx-auto">
+        <Carousel setApi={setApi} className="w-full mx-auto mt-4">
         <CarouselContent>
           {groups.map((group, index) => (
             <CarouselItem

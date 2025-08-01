@@ -4,6 +4,9 @@ import GroupCard from './GroupCard'
 import { Skeleton } from "@/components/ui/skeleton"
 
 const GroupList = ({ groups, loading }) => {
+  if (!groups || groups.length === 0) {
+    return <p className="text-muted-foreground">You are not part of any groups yet.</p>
+  }
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
@@ -14,9 +17,7 @@ const GroupList = ({ groups, loading }) => {
     )
   }
 
-  if (!groups || groups.length === 0) {
-    return <p className="text-muted-foreground">You are not part of any groups yet.</p>
-  }
+  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">

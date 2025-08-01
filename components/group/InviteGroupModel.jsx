@@ -187,12 +187,38 @@ const InviteMemberSheet = () => {
             </div>
           </SheetFooter>
 
-          {inviteLink && (
-            <div className="mt-4 text-xs text-muted-foreground break-all">
-              Invite Link (valid 7 days): <br />
-              <span className="text-white">{inviteLink}</span>
-            </div>
-          )}
+         {inviteLink && (
+  <div className="mt-6 border border-white/10 rounded-xl p-4 bg-white/5">
+    <p className="text-sm font-medium text-white mb-2">
+      Join Expense Buddy Group – manage expenses easily!
+    </p>
+
+    <button
+      className="w-full text-left px-3 py-2 bg-neutral-800 text-green-300 text-sm rounded-lg hover:bg-neutral-700 transition break-all"
+      onClick={() => {
+        navigator.clipboard.writeText(inviteLink)
+        toast.success('Invite link copied to clipboard!')
+      }}
+    >
+      {inviteLink}
+    </button>
+
+    <div className="mt-3 flex justify-end">
+      <Button
+        size="sm"
+        variant="secondary"
+        className="text-green-300 border border-green-300 hover:bg-green-900"
+        onClick={() => {
+          navigator.clipboard.writeText(inviteLink)
+          toast.success('Invite link copied!')
+        }}
+      >
+        Copy Link
+      </Button>
+    </div>
+  </div>
+)}
+
         </form>
 
         {/* ✅ Pending Requests – only for owner or admin */}

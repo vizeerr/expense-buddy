@@ -48,7 +48,7 @@ export async function POST(req, { params }) {
     )
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const fullLink = `${baseUrl}/group/join?token=${inviteToken}`
+    const fullLink = `${baseUrl}/dashboard/groups/join?token=${inviteToken}`
 
     return NextResponse.json({
       success: true,

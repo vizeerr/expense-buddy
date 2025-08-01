@@ -9,7 +9,6 @@ export async function POST(req) {
     if (!token) {
       return NextResponse.json({ success: false, message: 'Token is required' }, { status: 400 })
     }
-
     let decoded
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET)

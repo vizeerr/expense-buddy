@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Carousel,
@@ -27,11 +27,29 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchGroups } from '@/store/slices/group/groupSlice'
 import { useRouter } from 'next/navigation'
 
+import { cn } from '@/lib/utils'
 const GroupLists = () => {
   const dispatch = useDispatch()
     const router = useRouter()
   const { list: groups, loading } = useSelector((state) => state.groups)
 
+   const [api, setApi] = useState()
+    const [current, setCurrent] = useState(0)
+    const [count, setCount] = useState(0)
+  
+    useEffect(() => {
+      if (!api) {
+        return
+      }
+   
+      setCount(api.scrollSnapList().length)
+      setCurrent(api.selectedScrollSnap() + 1)
+   
+      api.on("select", () => {
+        setCurrent(api.selectedScrollSnap() + 1)
+      })
+    }, [api])
+  
   // useEffect(() => {
   //   dispatch(fetchGroups())
   // }, [dispatch])
@@ -55,11 +73,11 @@ const GroupLists = () => {
         You are not part of any groups yet or create a new group.
       </div>}
         {loading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-        {[...Array(3)].map((_, i) => (
+        {[...Array(1)].map((_, i) => (
           <Skeleton key={i} className="h-20 w-full rounded-lg" />
         ))}
       </div>}
-        <Carousel className="mt-5 sm:w-[90%] w-[80%] mx-auto">
+        <Carousel setApi={setApi} className="w-full mx-auto">
         <CarouselContent>
           {groups.map((group, index) => (
             <CarouselItem
@@ -84,8 +102,25 @@ const GroupLists = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        {count>1 && (
+                                         <div className="mt-4 flex justify-center flex-wrap gap-1">
+                                           {Array.from({ length: count }).map((_, index) => (
+                                             <button
+                                               key={index+1}
+                                               className={cn(
+                                                 'w-3 h-1 rounded-full transition-all',
+                                                 current === index+1
+                                                   ? 'bg-primary'
+                                                   : 'bg-muted-foreground/40 hover:bg-muted-foreground/70'
+                                               )}
+                                               onClick={() => api?.scrollTo(index)}
+                                               aria-label={`Go to slide ${index + 1}`}
+                                               
+                                             />
+                                           ))}
+                                           
+                                         </div>
+                                         )}
       </Carousel>
     </div>
   )

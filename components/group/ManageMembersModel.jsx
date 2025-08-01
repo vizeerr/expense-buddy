@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ShieldCheck, UserMinus, ArrowUp, ArrowDown } from 'lucide-react'
+import { ShieldCheck, UserMinus, ArrowUp, ArrowDown, ArrowLeft } from 'lucide-react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
@@ -76,11 +76,18 @@ const ManageMembersModel = () => {
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+        className="w-[95vw] max-w-xl mx-auto p-4 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
-        <SheetHeader className="px-0 py-2">
-          <SheetTitle className="text-sm text-neutral-500">Group Members</SheetTitle>
-        </SheetHeader>
+        
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft  className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Group Members</SheetTitle>
+          </SheetHeader>
+
 
         <ScrollArea className="mt-4 max-h-[60vh] pr-2">
           <div className="flex flex-col gap-4">

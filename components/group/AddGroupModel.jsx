@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { closeAddGroup } from '@/store/slices/uiSlice'
 import { createGroup } from '@/store/slices/group/groupSlice'
 import toast from 'react-hot-toast'
+import { ArrowLeft } from 'lucide-react'
 
 const AddGroupModal = () => {
   const isOpen = useSelector(state => state.ui.isAddGroupOpen)
@@ -60,13 +61,20 @@ const AddGroupModal = () => {
     <Sheet open={isOpen} onOpenChange={() => !loading && dispatch(closeAddGroup())}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-2xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
+        className="w-[95vw] max-w-2xl mx-auto p-4 rounded-3xl backdrop-blur-xl bg-transparent border-2 mb-10"
       >
         <form onSubmit={handleSubmit}>
-          <SheetHeader className="py-2 px-0">
-            <SheetTitle className="text-sm text-neutral-500 font-bold">Create New Group</SheetTitle>
-            <SheetDescription />
+         
+          
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft  className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Create New Group</SheetTitle>
           </SheetHeader>
+
 
           <div className="space-y-5 mt-3">
             <div className="grid gap-2">

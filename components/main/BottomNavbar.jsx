@@ -18,6 +18,7 @@ import axios from 'axios'
 import { CirclePlus, House, LogOut, UserRoundCog, Users, Wallet } from 'lucide-react'
 import { Button } from '../ui/button'
 import Link from 'next/link'
+import { openAddExpense } from '@/store/slices/uiSlice'
 
 const BottomNavbar = () => {
   const user = useSelector((state) => state.auth.user)
@@ -52,7 +53,7 @@ const BottomNavbar = () => {
               <p className='text-xs text-muted-foreground'>Expenses</p>
           </Link>
 
-          <div className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+          <div onClick={() => dispatch(openAddExpense())} className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
               <CirclePlus  size={28} className='text-amber-500 drop-shadow-2xl drop-shadow-amber-500'/>
             
@@ -65,7 +66,7 @@ const BottomNavbar = () => {
           </Link>
 
         
-          <Link href="/dashboard/profile" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+          <Link href="/dashboard/" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
               <UserRoundCog size={25} />
               <p className='text-xs text-muted-foreground'>Profile</p>

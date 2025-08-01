@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Wallet, HandCoins, TrendingUp, ArrowUpRight, ArrowDown, PiggyBank, Activity,
   Coins, BarChart as BarChartIcon, LineChart as LineChartIcon, FileBarChart, Percent,
@@ -22,6 +22,7 @@ import { fetchDashboard } from "../../utils/dashboardFetch"
 import { useLocalCollapse } from '@/hooks/useLocalCollapse'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import {
@@ -66,6 +67,23 @@ const BalanceCard = () => {
   const [budgetCollapse, toggleBudgetCollapse] = useLocalCollapse('budget-card') || "false"
   const [analyticCollapse, toggleAnalyticCollapse] = useLocalCollapse('analytic-card') || "false"
 
+   const [api, setApi] = useState()
+    const [current, setCurrent] = useState(0)
+    const [count, setCount] = useState(0)
+  
+    useEffect(() => {
+      if (!api) {
+        return
+      }
+   
+      setCount(api.scrollSnapList().length)
+      setCurrent(api.selectedScrollSnap() + 1)
+   
+      api.on("select", () => {
+        setCurrent(api.selectedScrollSnap() + 1)
+      })
+    }, [api])
+  
   useEffect(() => {
     fetchDashboard(dispatch)
   }, [dispatch])
@@ -175,7 +193,7 @@ const BalanceCard = () => {
             {expenseLoading
               ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
               : <>
-                  <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(expenseData?.dailyAverage)} color="text-red-400" bg="bg-red-950" />
+                  <StatItem icon={Activity} title="Daily Average" subtitle="This Month" value={currencyFormat(expenseData?.totalMonthlyExpense)} color="text-red-400" bg="bg-red-950" />
                   <StatItem icon={BarChartIcon} title="Weekly Average" subtitle="This Month" value={currencyFormat(expenseData?.weeklyAverage)} color="text-red-400" bg="bg-red-950" />
                   <StatItem icon={FileBarChart} title="Monthly Average" subtitle="Last 6 Months" value={currencyFormat(expenseData?.monthlyAverage)} color="text-red-400" bg="bg-red-950" />
                   <StatItem icon={LineChartIcon} title="Total Weekly Expense" subtitle="Current Week" value={currencyFormat(expenseData?.totalWeeklyExpense)} color="text-red-400" bg="bg-red-950" />
@@ -281,7 +299,7 @@ const BalanceCard = () => {
     >
           
         <CardContent className="px-4">
-          <Carousel className="sm:w-[90%] lg:w-[85%] 2xl:w-full w-[80%] mx-auto">
+          <Carousel setApi={setApi} className="w-full mx-auto">
             <CarouselContent>
 
               <CarouselItem className=" md:basis-1/2 lg:basis-full 2xl:basis-1/4">
@@ -335,8 +353,25 @@ const BalanceCard = () => {
               </ChartCard>
               </CarouselItem>
             </CarouselContent>
-            <CarouselPrevious className="2xl:hidden"/>
-                    <CarouselNext className="2xl:hidden" />
+           {count>1 && (
+                                 <div className="mt-4 flex justify-center flex-wrap gap-1">
+                                   {Array.from({ length: count }).map((_, index) => (
+                                     <button
+                                       key={index+1}
+                                       className={cn(
+                                         'w-3 h-1 rounded-full transition-all',
+                                         current === index+1
+                                           ? 'bg-primary'
+                                           : 'bg-muted-foreground/40 hover:bg-muted-foreground/70'
+                                       )}
+                                       onClick={() => api?.scrollTo(index)}
+                                       aria-label={`Go to slide ${index + 1}`}
+                                       
+                                     />
+                                   ))}
+                                   
+                                 </div>
+                                 )}
           </Carousel>
         </CardContent>
          </motion.div>

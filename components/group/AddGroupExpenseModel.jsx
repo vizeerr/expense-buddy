@@ -77,7 +77,7 @@ const AddGroupExpenseModal = () => {
   // 🧠 Derived current group
   const currentGroup = groups.find(g => g._id === currentGroupId)
   const allMemberIds = currentGroup?.members.map(m => m.user._id) || []
-const allSelected = (form.splitBetween?.length || 0) === (allMemberIds?.length || 0)
+  const allSelected = (form.splitBetween?.length || 0) === (allMemberIds?.length || 0)
 
   useEffect(() => {
     if (currentGroupId) {

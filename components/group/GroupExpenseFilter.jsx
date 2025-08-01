@@ -46,10 +46,10 @@ const GroupExpenseFilters = ({groupMembers}) => {
   
 
  const applyFilters = () => {
-   const hasChanges = Object.entries(defaultFilters).some(
-      ([key, value]) => filters[key] !== value
-    )
-    if (hasChanges) {
+  //  const hasChanges = Object.entries(defaultFilters).some(
+  //     ([key, value]) => filters[key] !== value
+  //   )
+  //   if (hasChanges) {
       dispatch(setGroupExpenseFilters({
         search,
         type,
@@ -60,7 +60,7 @@ const GroupExpenseFilters = ({groupMembers}) => {
         fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
         toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
       }))
-    }
+    // }
     setOpen(false)
   }
   const clearFilters = () => {
@@ -202,16 +202,16 @@ const GroupExpenseFilters = ({groupMembers}) => {
                   <SelectItem value="true">Trashed</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={paidBy} onValueChange={setPaidBy}>
-                      <SelectTrigger className="w-full lg:w-[160px] capitalize">
-                        <SelectValue placeholder="Paid By" />
+              <Select className="w-full" value={paidBy} onValueChange={setPaidBy}>
+                      <SelectTrigger className="w-full  capitalize">
+                        <SelectValue placeholder="Paid By" className="w-full"/>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="w-full">
 
                         {groupMembers
                           .filter(member => member && member._id && member.name)
                           .map(member => (
-                              <SelectItem  className="capitalize" key={member._id} value={member._id}>
+                              <SelectItem  className="capitalize w-full" key={member._id} value={member._id}>
                               {member.name}
                               </SelectItem>
                           ))}
@@ -220,7 +220,7 @@ const GroupExpenseFilters = ({groupMembers}) => {
                     </Select>
                     
                     <Select value={addedBy} onValueChange={setAddedBy}>
-                      <SelectTrigger className="w-full lg:w-[160px] capitalize">
+                      <SelectTrigger className="w-full  capitalize">
                         <SelectValue placeholder="Created By" />
                       </SelectTrigger>
                       <SelectContent>

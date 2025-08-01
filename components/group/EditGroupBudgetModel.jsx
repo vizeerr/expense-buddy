@@ -12,6 +12,7 @@ import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { closeGroupAddBudget } from '@/store/slices/uiSlice'
 import { fetchGroupBudgetSummary } from '@/store/slices/group/groupBudgetSummarySlice'
+import { ArrowLeft } from 'lucide-react'
 
 const EditGroupBudgetModel = ({ groupId }) => {
   const dispatch = useDispatch()
@@ -64,13 +65,17 @@ const EditGroupBudgetModel = ({ groupId }) => {
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-xl mx-auto p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+        className="w-[95vw] max-w-xl mx-auto p-4 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit}>
-          <SheetHeader className="px-0 py-2">
-            <SheetTitle className="text-sm text-neutral-500">Update Group Monthly Budget</SheetTitle>
+         <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-2 border-b'>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Update Group Monthly Budget</SheetTitle>
           </SheetHeader>
-
           <div className="mt-5 grid gap-3">
             <Label htmlFor="budget" className="text-base">Monthly Budget (₹)</Label>
             <Input

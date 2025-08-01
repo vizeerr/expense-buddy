@@ -20,6 +20,7 @@ import {
   StickyNote,
   HandHelping,
   UserRound,
+  ArrowLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import EditGroupExpenseModel from '@/components/group/EditGroupExpenseModel'
@@ -37,6 +38,7 @@ import {
 import { filterExpenses } from '@/utils/helper'
 import {fetchGroupExpenses} from "@/store/slices/group/groupExpensesSlice"
 import { getColorConfigFromString } from "../../utils/colorPalette"
+import { fetchGroupDashboard } from "../../utils/dashboardFetch"
 
 const ViewGroupExpenseModel = () => {
   const dispatch = useDispatch()
@@ -94,6 +96,28 @@ const ViewGroupExpenseModel = () => {
     }
   }
 
+    const handlePermanentDelete = async (id) => {
+    const toastId = toast.loading("Deleting Permanently...")
+
+    try {
+      const res = await axios.delete(`/api/groups/${expense.groupId}/expenses/trash-expenses/${expense._id}`)
+      if (res.status === 200) {
+        dispatch(deleteGroupExpense(id))
+        dispatch(closeGroupViewExpense())
+        fetchGroupDashboard(dispatch,{force:true})
+        toast.success((t) => (
+          <span className="flex items-center gap-2">
+            Removed <b>Permanently</b>
+          </span>
+        ), { id: toastId, duration: 5000 })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Unable to delete expense", { id: toastId })
+    }
+  }
+
+
   if (!expense) return null
 
   return (
@@ -101,11 +125,15 @@ const ViewGroupExpenseModel = () => {
       <Sheet open={viewGroupExpense.open} onOpenChange={() => dispatch(closeGroupViewExpense())}>
         <SheetContent
           side="bottom"
-          className="w-[95vw] max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+          className="w-[95vw] max-w-3xl mx-auto p-4  rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
         >
-          <SheetHeader className="px-0">
-            <SheetTitle className="text-sm text-neutral-500">Detailed View</SheetTitle>
-            <SheetDescription />
+          <SheetHeader className='flex flex-row items-center gap-3  px-0 pt-0 pb-0 '>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" type="button">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </SheetClose>
+            <SheetTitle className='text-sm text-neutral-500 font-bold'>Detailed View</SheetTitle>
           </SheetHeader>
 
           {/* Expense Detail Card */}
@@ -113,7 +141,7 @@ const ViewGroupExpenseModel = () => {
             {/* Header */}
             <div className="flex justify-between items-start mb-4 gap-2">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 capitalize">
-                {expense.title}
+                {expense.title} 
               </h2>
               <span
                 className={`text-xs font-bold px-3 py-1 rounded-full shadow-inner border 
@@ -154,20 +182,21 @@ const ViewGroupExpenseModel = () => {
               </div>
               <div className="flex items-center gap-2 capitalize">
                 <UserRound className="w-4 h-4 text-green-500" />
-                <span className="font-medium">Paid By:</span> {expense.paidBy.name  || 'N/A'} 
-                <span className="text-xs text-muted-foreground lowercase">({(expense.paidBy.email )})</span>
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="font-medium">Paid By:</span> {expense.paidBy.name  || 'N/A'} 
+                  <span className="text-xs text-muted-foreground lowercase">({(expense.paidBy.email )})</span>
+                </div>
               </div>
               <div className="flex items-center gap-2 capitalize">
                 <UserRound className="w-4 h-4 text-amber-500" />
-                <span className="font-medium">Created By:</span> {expense.addedBy.name || 'N/A'}
-                <span className="text-xs text-muted-foreground lowercase">({(expense.addedBy.email )})</span>
+                 <div className="flex flex-wrap gap-1.5">
+
+                  <span className="font-medium">Created By:</span> {expense.addedBy.name || 'N/A'}
+                  <span className="text-xs text-muted-foreground lowercase">({(expense.addedBy.email )})</span>
+                 </div>
 
               </div>
-              
 
-
-              
-              
             </div>
            <div className="mt-4 flex items-center gap-2 capitalize flex-wrap">
   <UserRound className="w-4 h-4 text-amber-500" />
@@ -180,7 +209,7 @@ const ViewGroupExpenseModel = () => {
         return (
           <span
             key={user._id || index}
-            className={`${color.border} border rounded-2xl px-3 py-2 text-xs`}
+            className={`${color.border} border rounded-2xl px-3 py-1.5 text-xs`}
           >
             {user.name}
             <span className="text-muted-foreground lowercase"> ({user.email})</span>
@@ -196,31 +225,60 @@ const ViewGroupExpenseModel = () => {
           </div>
 
           {/* Footer Buttons */}
-          <SheetFooter className="p-0 mt-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-              <SheetClose asChild>
-                <Button variant="outline" size="lg" className="w-full text-white">
-                  Close
-                </Button>
-              </SheetClose>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full text-green-500"
-                onClick={() => dispatch(openGroupEditExpense(expense._id))}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full text-red-500"
-                onClick={() => handledeleteGroupExpense(expense._id)}
-              >
-                Delete
-              </Button>
-            </div>
-          </SheetFooter>
+       
+           {/* Footer Buttons */}
+                    <SheetFooter className="p-0 mt-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                        <SheetClose asChild>
+                          <Button variant="outline" size="lg" className="w-full text-white">
+                            Close
+                          </Button>
+                        </SheetClose>
+                        {
+                          expense.trashed? ( <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full text-green-500"
+                          onClick={() => undoTrash(expense._id)}
+                        >
+                          Restore
+                        </Button>):(
+                          <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full text-green-500"
+                          onClick={() => dispatch(openGroupEditExpense(expense._id))}
+                        >
+                          Edit
+                        </Button>
+                        )
+                        }
+                        
+                        {
+                          expense.trashed ? (
+                            <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full text-red-500"
+                          onClick={() => handlePermanentDelete(expense._id)}
+                        >
+                          Delete Forever
+                        </Button>
+                          ) : (
+                            <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full text-red-500"
+                          onClick={() => handledeleteGroupExpense(expense._id)}
+                        >
+                          Trash
+                        </Button>
+                          )
+                        }
+                        
+                      </div>
+                    </SheetFooter>
+
         </SheetContent>
       </Sheet>
 

@@ -44,10 +44,10 @@ const ExpenseFilters = () => {
   }
 
   const applyFilters = () => {
-    const hasChanges = Object.entries(defaultFilters).some(
-    ([key, value]) => filters[key] !== value
-    )
-    if (hasChanges) {
+    // const hasChanges = Object.entries(defaultFilters).some(
+    // ([key, value]) => filters[key] !== value
+    // )
+    // if (hasChanges) {
       dispatch(setFilters({
         search,
         type,
@@ -57,7 +57,7 @@ const ExpenseFilters = () => {
         fromDate: fromDate ? format(fromDate, 'yyyy-MM-dd') : '',
         toDate: toDate ? format(toDate, 'yyyy-MM-dd') : '',
       }))
-    }
+    // }
     setOpen(false)
   }
   

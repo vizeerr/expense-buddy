@@ -277,7 +277,10 @@ const GroupExpenseItem = ({ expense }) => {
                 <span className="text-white capitalize text-[0.6rem]">{expense.addedBy?.name || 'Unknown'}</span>
               </div>
               }
+
+              
             </div>
+
 
       {/* Category & Amount */}
       
@@ -304,6 +307,15 @@ const GroupExpenseItem = ({ expense }) => {
                 <span className="text-white capitalize text-[0.6rem]">{expense.addedBy?.name || 'Unknown'}</span>
               </div>
               }
+               
+        </div>
+        <div>
+          {expense?.splitBetween?.some(member => member.email === user?.email) ? (
+  <span className="text-xs text-red-500">You are included</span>
+) : (
+  <span className="text-xs text-muted-foreground">You are not included</span>
+)}
+
         </div>
 
        </div>
@@ -324,14 +336,7 @@ const GroupExpenseItem = ({ expense }) => {
         </p>
          
         </div>
-        <div>
-          {expense?.splitBetween?.some(member => member.email === user?.email) ? (
-  <span className="text-xs text-red-500">You are included</span>
-) : (
-  <span className="text-xs text-muted-foreground">You are not included</span>
-)}
-
-        </div>
+        
         
 </div>
   

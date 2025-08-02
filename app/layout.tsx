@@ -37,7 +37,8 @@ export const metadata: Metadata = {
     ],
     type: 'website',
   },
-  manifest: '/manifest.json'
+  manifest: '/manifest.json',
+  themeColor:"#000000"
 };
 
 export default function RootLayout({

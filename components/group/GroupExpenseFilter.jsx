@@ -97,7 +97,7 @@ const GroupExpenseFilters = ({groupMembers}) => {
   
   useEffect(()=>{
     dispatch(fetchGroups)
-  })
+  },[dispatch])
    const renderDatePicker = (label, date, setDate) => (
     <Popover>
       <PopoverTrigger asChild>

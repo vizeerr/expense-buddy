@@ -16,7 +16,8 @@ export async function POST(req, { params }) {
       return NextResponse.json({ success: false, message: 'Invalid action or userId' }, { status: 400 })
     }
 
-    const token = cookies().get('authToken')?.value
+    const cookieStore = await cookies()
+    const token = cookieStore.get('authToken')?.value
     if (!token) return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)

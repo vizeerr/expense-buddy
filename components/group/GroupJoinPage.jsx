@@ -56,8 +56,12 @@ export default function GroupJoinPage() {
         toast.error(res.data.message)
       }
     } catch (err) {
+      if(err.response.data.message){
+        toast.error(err.response.data.message)
+      }else{
+        toast.error('Internal Server Error')
+      }
       console.log(err)
-      toast.error('Error sending join request')
     } finally {
       setRequesting(false)
     }

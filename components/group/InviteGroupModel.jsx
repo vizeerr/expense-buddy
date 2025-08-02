@@ -23,6 +23,8 @@ const InviteMemberSheet = () => {
   const dispatch = useDispatch()
   const open = useSelector(state => state.ui.isInviteGroupOpen)
   const group = useSelector(state => state.groupDetail.group)
+  console.log(group);
+  
   const groupId = group?._id
   // console.log(group);
   
@@ -222,14 +224,14 @@ const InviteMemberSheet = () => {
         </form>
 
         {/* ✅ Pending Requests – only for owner or admin */}
-        {canApprove && group?.joinRequests?.length > 0 && (
+        {canApprove && group?.joinRequests && group?.joinRequests?.length > 0 && (
           <div className="mt-2">
             <h3 className="text-sm text-neutral-400 mb-2">Pending Join Requests</h3>
             
               <div className="flex flex-col gap-3">
                 {group.joinRequests.map(req => (
                   <div
-                    key={req.user?._id}
+                    key={req.user?.email}
                     className="flex  flex-wrap gap-3 justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2"
                   >
                     <div>

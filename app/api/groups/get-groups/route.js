@@ -15,7 +15,10 @@ export async function GET() {
       ]
     })
       .populate('owner', 'name email') // optional: populate owner info
-      .populate('members.user', 'name email') // populate members info
+      .populate('members.user', 'name email')
+      .populate('joinRequests.user', 'name email')
+      
+      // populate members info
       .sort({ createdAt: -1 })
     return NextResponse.json({
       success: true,

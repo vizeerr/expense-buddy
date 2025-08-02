@@ -68,9 +68,9 @@ useEffect(() => {
       <GroupExpenseCard/>
       
       <div className='bg-transparent border   p-4 rounded-2xl'>
-        <div className='flex justify-between items-center '>
+        <div className='flex flex-col gap-4 '>
           <h2 className="text-2xl font-bold ">All Expenses</h2>
-           <div className='flex gap-2'>
+           <div className='flex gap-2 justify-end'>
 
            <Button
       size="sm"

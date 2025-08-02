@@ -6,6 +6,7 @@ import BottomNavbar from "@/components/main/BottomNavbar"
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Providers from "@/components/main/Providers"
+import PWARegister from "@/components/main/PWARegister"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -63,6 +64,7 @@ export default function RootLayout({
               />
               <BottomNavbar/>
             </Providers>
+            <PWARegister />
            
           </ThemeProvider>
         

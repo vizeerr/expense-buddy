@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
-
+  
   try {
     await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET))
     return NextResponse.next()

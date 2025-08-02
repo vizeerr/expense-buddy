@@ -1,7 +1,7 @@
 {
   "name": "Expense Buddy",
   "short_name": "Expense Buddy",
-  "start_url": "/",
+  "start_url": "/dashboard/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000",

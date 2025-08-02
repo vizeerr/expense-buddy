@@ -8,7 +8,7 @@ export const fetchAnalytics = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await axios.get('/api/dashboard/analytics')
-      console.log("Analytics Data:", res.data.data);
+      // console.log("Analytics Data:", res.data.data);
       return res.data.data
     } catch (err) {
       toast.error('Failed to load analytics')

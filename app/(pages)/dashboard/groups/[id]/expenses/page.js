@@ -30,7 +30,7 @@ const ExpensesPage = () => {
  )
 
 useEffect(() => {
-    console.log(groups);
+    // console.log(groups);
     
     const group = groups.find(e => e._id === groupId)
     if (group) {

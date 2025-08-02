@@ -51,7 +51,7 @@ export default function GroupMemberCard({ groupId }) {
       </div>
       <div className="flex gap-4 ">
         {[...Array(1)].map((_, i) => (
-          <Skeleton key={i} className="h-44 w-80 rounded-xl" />
+          <Skeleton key={i} className="h-44 sm:w-80 w-full rounded-xl" />
         ))}
       </div>
       </div>

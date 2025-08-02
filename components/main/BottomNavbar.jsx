@@ -9,6 +9,7 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
+import { usePathname } from 'next/navigation'
 
 
 import { useSelector,useDispatch } from 'react-redux'
@@ -22,6 +23,15 @@ import { openAddExpense } from '@/store/slices/uiSlice'
 
 const BottomNavbar = () => {
   const user = useSelector((state) => state.auth.user)
+  const pathname = usePathname()
+
+const isActive = (path) => {
+  if (path === '/dashboard') {
+    return pathname === '/dashboard' // exact match for Home
+  }
+  return pathname.startsWith(path) // partial match for others
+}
+
   const dispatch = useDispatch()
   const logoutAcc = async() =>{
     try {
@@ -40,18 +50,18 @@ const BottomNavbar = () => {
       <div className='fixed bottom-2 z-3 w-full flex justify-center'>
 
         <div className='flex items-center justify-between border-2 w-[95vw] max-w-sm border-neutral-600 bg-transparent backdrop-blur-2xl h-full rounded-full px-4 py-1.5 drop-shadow-2xl drop-shadow-accent-foreground'>    
-          <Link href="/dashboard" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
-           
-              <House size={25} />
-              <p className='text-xs text-muted-foreground'>Home</p>
-        
-          </Link>
+        <Link href="/dashboard" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+  <House size={25} className={isActive('/dashboard') ? 'text-amber-500' : 'text-muted-foreground'} />
+  <p className={`text-xs ${isActive('/dashboard') ? 'text-amber-500' : 'text-muted-foreground'}`}>Home</p>
+</Link>
 
-          <Link href="/dashboard/expenses" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
-           
-              <Wallet size={25} />
-              <p className='text-xs text-muted-foreground'>Expenses</p>
-          </Link>
+<Link href="/dashboard/expenses" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+  <Wallet size={25} className={isActive('/dashboard/expenses') ? 'text-amber-500' : 'text-muted-foreground'} />
+  <p className={`text-xs ${isActive('/dashboard/expenses') ? 'text-amber-500' : 'text-muted-foreground'}`}>Expenses</p>
+</Link>
+
+
+
 
           <div onClick={() => dispatch(openAddExpense())} className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
@@ -60,18 +70,14 @@ const BottomNavbar = () => {
           </div>
 
           <Link href="/dashboard/groups" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
-           
-              <Users size={25} />
-              <p className='text-xs text-muted-foreground'>Groups</p>
-          </Link>
+  <Users size={25} className={isActive('/dashboard/groups') ? 'text-amber-500' : 'text-muted-foreground'} />
+  <p className={`text-xs ${isActive('/dashboard/groups') ? 'text-amber-500' : 'text-muted-foreground'}`}>Groups</p>
+</Link>
 
-        
-          <Link href="/dashboard/" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
-           
-              <UserRoundCog size={25} />
-              <p className='text-xs text-muted-foreground'>Profile</p>
-          </Link>
-
+<Link href="/dashboard/profile" className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
+  <UserRoundCog size={25} className={isActive('/dashboard/profile') ? 'text-amber-500' : 'text-muted-foreground'} />
+  <p className={`text-xs ${isActive('/dashboard/profile') ? 'text-amber-500' : 'text-muted-foreground'}`}>Profile</p>
+</Link>
         </div>
             
       {/* <Menubar className=''>

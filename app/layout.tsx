@@ -26,7 +26,6 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Expense Buddy',
     description: 'Track your expenses easily',
-   
     siteName: 'Expense Buddy',
     images: [
       {
@@ -38,8 +37,7 @@ export const metadata: Metadata = {
     ],
     type: 'website',
   },
-  manifest: '/manifest.json',
-   themeColor: '#000000',
+  manifest: '/manifest.json'
 };
 
 export default function RootLayout({

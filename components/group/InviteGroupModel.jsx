@@ -24,7 +24,7 @@ const InviteMemberSheet = () => {
   const open = useSelector(state => state.ui.isInviteGroupOpen)
   const group = useSelector(state => state.groupDetail.group)
   const groupId = group?._id
-  console.log(group);
+  // console.log(group);
   
   const currentUserId = useSelector(state => state.auth.user?._id)
 
@@ -121,7 +121,7 @@ const InviteMemberSheet = () => {
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
-        className="w-[95vw] max-w-xl mx-auto p-4 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
+        className="w-[95vw] max-w-xl max-h-[90vh] mx-auto p-4 rounded-3xl backdrop-blur-xl bg-transparent border-2 md:mb-10 mb-4"
       >
         <form onSubmit={handleSubmit}>
           
@@ -135,7 +135,7 @@ const InviteMemberSheet = () => {
           </SheetHeader>
 
 
-          <div className="mt-5 grid gap-4">
+          <div className="mt-5 grid gap-4 overflow-y-auto">
             <div>
               <Label htmlFor="email" className="text-base">User Email</Label>
               <Input
@@ -194,13 +194,13 @@ const InviteMemberSheet = () => {
     </p>
 
     <button
-      className="w-full text-left px-3 py-2 bg-neutral-800 text-green-300 text-sm rounded-lg hover:bg-neutral-700 transition break-all"
+      className="w-full text-left px-3 py-2 bg-transparentborder text-green-300 text-sm rounded-lg hover:bg-neutral-700 transition break-all"
       onClick={() => {
         navigator.clipboard.writeText(inviteLink)
         toast.success('Invite link copied to clipboard!')
       }}
     >
-      {inviteLink}
+      {inviteLink.slice(0,60)}...
     </button>
 
     <div className="mt-3 flex justify-end">
@@ -223,14 +223,14 @@ const InviteMemberSheet = () => {
 
         {/* ✅ Pending Requests – only for owner or admin */}
         {canApprove && group?.joinRequests?.length > 0 && (
-          <div className="mt-10">
+          <div className="mt-2">
             <h3 className="text-sm text-neutral-400 mb-2">Pending Join Requests</h3>
-            <ScrollArea className="max-h-[40vh] pr-2">
+            
               <div className="flex flex-col gap-3">
                 {group.joinRequests.map(req => (
                   <div
                     key={req.user._id}
-                    className="flex justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2"
+                    className="flex  flex-wrap gap-3 justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2"
                   >
                     <div>
                       <p className="text-sm text-white">{req.user.name}</p>
@@ -255,7 +255,7 @@ const InviteMemberSheet = () => {
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            
           </div>
         )}
       </SheetContent>

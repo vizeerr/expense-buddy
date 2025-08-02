@@ -33,9 +33,9 @@ const GroupExpenseShortcuts = ({groupId}) => {
           <div className="flex items-center justify-between">
             <p className="text-base font-semibold text-white">
               Recent Activity
-              <span className="text-xs text-neutral-400 font-semibold ml-1">
+              {/* <span className="text-xs text-neutral-400 font-semibold ml-1">
                 ({expenses.length} transactions)
-              </span>
+              </span> */}
             </p>
             <p className="text-xs font-bold text-neutral-500">Today</p>
           </div>

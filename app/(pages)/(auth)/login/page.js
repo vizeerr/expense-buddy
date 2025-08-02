@@ -46,7 +46,7 @@ export default function LoginPage() {
     const result = LoginSchema.safeParse(form)
 
     if (!result.success) {
-      console.log(result);
+      // console.log(result);
       
       setErrors(result.error.flatten().fieldErrors)
       toast.error('Please fix validation errors')

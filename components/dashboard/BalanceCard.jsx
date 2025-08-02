@@ -230,10 +230,10 @@ const BalanceCard = () => {
            <hr />
           <div className="flex justify-between">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Monthly Budget</p>
+              <p className="text-sm text-muted-foreground">Used Monthly Budget</p>
               {budgetLoading
                 ? <Skeleton className="w-28 h-6 rounded" />
-                : <p className="text-2xl font-semibold text-yellow-400">{currencyFormat(budgetData?.monthlyBudget)}</p>}
+                : <p className="text-2xl font-semibold text-yellow-400">{currencyFormat(budgetData?.usedBudget)}</p>}
             </div>
             <p className="text-xs font-semibold text-muted-foreground">This Month</p>
           </div>
@@ -251,7 +251,7 @@ const BalanceCard = () => {
             {budgetLoading
               ? Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-[58px] w-full rounded-lg" />)
               : <>
-                  <StatItem icon={ArrowUpRight} title="Used Budget" subtitle="So far" value={currencyFormat(budgetData?.usedBudget)} color="text-yellow-300" bg="bg-yellow-900" />
+                  <StatItem icon={ArrowUpRight} title="Monthly Budget" subtitle="So far" value={currencyFormat(budgetData?.monthlyBudget)} color="text-yellow-300" bg="bg-yellow-900" />
                   <StatItem icon={PiggyBank} title="Remaining Budget" subtitle="Left to Spend" value={currencyFormat(budgetData?.remainingBudget)} color="text-green-300" bg="bg-green-900" />
                   <StatItem icon={Hourglass} title="Days Left" subtitle="In Budget Cycle" value={`${budgetData?.daysLeft || 0} Days`} color="text-blue-400" bg="bg-blue-950" />
                   <StatItem icon={Tag} title="Most Spent In" subtitle={budgetData?.mostExpendedCategory?.name || "-"} value={currencyFormat(budgetData?.mostExpendedCategory?.amount)} color="text-red-400" bg="bg-red-950" />

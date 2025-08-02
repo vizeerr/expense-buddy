@@ -14,7 +14,7 @@ export async function sendMail(type, data) {
 
     const result = await response.json()
     if (result.status !== 'success') {
-        console.log(result.message);
+        // console.log(result.message);
         throw new Error('Mail send failed')
     }
     return true

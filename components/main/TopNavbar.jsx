@@ -20,7 +20,7 @@ const TopNavbar = () => {
         
         
       
-          <Button aschild="true" variant="ghost" className={`${!user?"black":"hidden"} bg-white text-black`}>
+          <Button aschild="true" variant="ghost" className={`${!user?"black":"hidden"} hidden bg-white text-black`}>
           <Link href="/login">  
             Login
           </Link>

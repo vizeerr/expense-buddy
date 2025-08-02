@@ -25,7 +25,7 @@ import { useSelector } from 'react-redux'
 const GroupCard = ({ group }) => {
   const router = useRouter()
   const currentUser = useSelector((state) => state.auth.user)
-  console.log(group);
+  // console.log(group);
   
 
   const members = group.members || []

@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import {fetchGroupExpenses} from "@/store/slices/group/groupExpensesSlice"
 
@@ -82,6 +82,8 @@ const getIconForExpense = (type, category) => {
 }
 
 const GroupExpenseItem = ({ expense }) => {
+    const user = useSelector((state) => state.auth.user)
+
   const dispatch = useDispatch()
   const Icon = getIconForExpense(expense.type, expense.category)
   const date = new Date(expense.datetime)
@@ -261,7 +263,7 @@ const GroupExpenseItem = ({ expense }) => {
          
         </div>
       {/* member  */}
-      <div className='flex sm:hidden  gap-2'>
+          <div className='flex sm:hidden  gap-2'>
               <div className="flex items-center gap-1 bg-neutral-900 px-2 py-1 rounded-full text-green-500 text-[0.6rem]">
                 <UserRound className="w-2.5 h-2.5" />
                 <span className="font-medium text-[0.6rem]">Paid By:</span>
@@ -306,7 +308,7 @@ const GroupExpenseItem = ({ expense }) => {
 
        </div>
         
-
+<div className='flex flex-col justify-end items-end'>
         <div className='flex'>
           <p
           className={`text-base font-semibold flex gap-1 items-center flex-shrink-0 ${
@@ -322,7 +324,17 @@ const GroupExpenseItem = ({ expense }) => {
         </p>
          
         </div>
+        <div>
+          {expense?.splitBetween?.some(member => member.email === user?.email) ? (
+  <span className="text-xs text-red-500">You are included</span>
+) : (
+  <span className="text-xs text-muted-foreground">You are not included</span>
+)}
+
+        </div>
         
+</div>
+  
       </div>
 
       

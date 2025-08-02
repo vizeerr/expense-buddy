@@ -18,7 +18,7 @@ import groupExpensesSummaryReducer from './slices/group/groupExpenseSummarySlice
 import groupBudgetReducer from './slices/group/groupBudgetSummarySlice';
 import groupAnalyticsReducer from './slices/group/groupAnalyticsSlice';
 import memberSummarySlice from './slices/group/memberSummarySlice'
-
+import userSettlementSlice from './slices/group/userSettlementSlice'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -39,6 +39,7 @@ export const store = configureStore({
     groupExpensesSummary: groupExpensesSummaryReducer,
     groupBudget: groupBudgetReducer,
     groupAnalytics: groupAnalyticsReducer,
-    groupMember:memberSummarySlice
+    groupMember:memberSummarySlice,
+    settlements:userSettlementSlice
   },
 });

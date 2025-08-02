@@ -25,6 +25,7 @@ const uiSlice = createSlice({
     viewGroupExpense: { open: false, id: null },
     editGroupExpense: { open: false, id: null },
     deleteGroupExpense: { open: false, id: null },
+    isSettlementSheetOpen: false,
   },
 
   reducers: {
@@ -90,6 +91,8 @@ const uiSlice = createSlice({
     closeGroupDeleteExpense: (state) => {
       state.deleteGroupExpense = { open: false, id: null }
     },
+    openSettlementSheet: (state) => { state.isSettlementSheetOpen = true },
+  closeSettlementSheet: (state) => { state.isSettlementSheetOpen = false },
   }
 })
 
@@ -108,7 +111,7 @@ export const {
   openGroupEditExpense, closeGroupEditExpense,
   openGroupDeleteExpense, closeGroupDeleteExpense,
   openGroupAddBudget, closeGroupAddBudget,closeGroupEdit,openGroupEdit,openGroupInvite,closeGroupInvite,
-  openManageMembers,closeManageMembers
+  openManageMembers,closeManageMembers,openSettlementSheet,closeSettlementSheet
 } = uiSlice.actions
 
 export default uiSlice.reducer

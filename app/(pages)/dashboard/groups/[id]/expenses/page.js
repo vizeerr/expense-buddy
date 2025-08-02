@@ -15,6 +15,9 @@ import { openAddGroupExpense } from "@/store/slices/uiSlice"
 import AddGroupExpenseModel from '@/components/group/AddGroupExpenseModel'
 import {fetchGroups} from "@/store/slices/group/groupSlice"
 import GroupExpenseCard from '../../../../../../components/group/GroupExpenseCard'
+import UserSettlementSheet from '../../../../../../components/group/UserSettlementSlice'
+
+import { openSettlementSheet } from '@/store/slices/uiSlice' // ✅ Make sure this exists
 
 const ExpensesPage = () => {
   const dispatch = useDispatch()
@@ -67,12 +70,24 @@ useEffect(() => {
       <div className='bg-transparent border   p-4 rounded-2xl'>
         <div className='flex justify-between items-center '>
           <h2 className="text-2xl font-bold ">All Expenses</h2>
+           <div className='flex gap-2'>
+
+           <Button
+      size="sm"
+      className="border bg-transparent border-green-400 text-green-400 drop-shadow-xl drop-shadow-green-500"
+      onClick={() => dispatch(openSettlementSheet())} // ✅ Trigger opening
+      >
+      Settle Up
+    </Button>
           <Button size="sm" className=" bg-transparent border border-red-500 text-red-500 drop-shadow-xl drop-shadow-red-600"  onClick={()=>dispatch(openAddGroupExpense())}>
             <Plus/>
             Add Expense
           </Button>
+      </div>
         </div>
-
+      
+     
+      <UserSettlementSheet groupId={groupId}/>
       <GroupExpenseFilter groupMembers={groupMembers}/>
 
       {list.length === 0 && !loading && (

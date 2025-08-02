@@ -49,6 +49,9 @@ const GroupExpenseSchema = z.object({
     .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
       message: 'Invalid time format (HH:mm)',
     }),
+    splitBetween: z
+    .array(z.string().min(1, 'Invalid user id'))
+    .min(1, 'At least one member must be selected'),
   paidBy: z.string().min(1, 'PaidBy is required'),
   groupId: z.string().min(1, 'PaidBy is required'),
 })
@@ -81,7 +84,8 @@ if (!result.success) {
       paidBy,
       groupId,
       date,
-      time
+      time,
+      splitBetween
     } = result.data
 
     const datetime = new Date(`${date}T${time}:00`)
@@ -117,7 +121,7 @@ if (!result.success) {
     expense.paidBy = paidBy
     expense.datetime = datetime
     expense.groupId = groupId // ✅ assign new group if changed
-
+    expense.splitBetween = splitBetween
     await expense.save()
 
     return NextResponse.json({

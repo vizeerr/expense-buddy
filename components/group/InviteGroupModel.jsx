@@ -229,24 +229,24 @@ const InviteMemberSheet = () => {
               <div className="flex flex-col gap-3">
                 {group.joinRequests.map(req => (
                   <div
-                    key={req.user._id}
+                    key={req.user?._id}
                     className="flex  flex-wrap gap-3 justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2"
                   >
                     <div>
-                      <p className="text-sm text-white">{req.user.name}</p>
-                      <p className="text-xs text-muted-foreground">{req.user.email}</p>
+                      <p className="text-sm text-white">{req.user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{req.user?.email}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleRequestAction(req.user._id, 'approve')}
+                        onClick={() => handleRequestAction(req.user?._id, 'approve')}
                         className="bg-green-900 text-green-300"
                       >
                         Accept
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => handleRequestAction(req.user._id, 'reject')}
+                        onClick={() => handleRequestAction(req.user?._id, 'reject')}
                         className="bg-red-900 text-red-300"
                       >
                         Reject

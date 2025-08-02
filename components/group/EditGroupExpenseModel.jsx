@@ -27,6 +27,8 @@ import { fetchGroups } from '@/store/slices/group/groupSlice'
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 import { fetchGroupDashboard } from '../../utils/dashboardFetch'
+
+import { groupExpenseSchema } from '../../lib/schemas/ValidationSchema'
 const EditGroupExpenseModal = () => {
   const dispatch = useDispatch()
   const { id: currentGroupId } = useParams()

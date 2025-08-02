@@ -65,7 +65,7 @@ const isActive = (path) => {
 
           <div onClick={() => dispatch(openAddExpense())} className='w-14 h-12 rounded-2xl transition-all flex pointer gap-0 flex-col justify-center items-center'>
            
-              <CirclePlus  size={28} className='text-amber-500 drop-shadow-2xl drop-shadow-amber-500'/>
+              <CirclePlus  size={28} className='text-green-500 drop-shadow-2xl drop-shadow-green-500'/>
             
           </div>
 

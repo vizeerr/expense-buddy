@@ -200,7 +200,7 @@ const InviteMemberSheet = () => {
         toast.success('Invite link copied to clipboard!')
       }}
     >
-      {inviteLink.slice(0,60)}...
+      {inviteLink.slice(0,80)}...
     </button>
 
     <div className="mt-3 flex justify-end">
